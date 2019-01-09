@@ -8,7 +8,7 @@ module.exports = {
       res.send(websites)
     } catch (err) {
       res.status(500).send({
-        error: 'an error has occured trying to create the song : ' + err
+        error: err.errors
       })
     }
   },
@@ -18,7 +18,7 @@ module.exports = {
       res.send(web)
     } catch (err) {
       res.status(500).send({
-        error: 'an error has occured trying to create the song'
+        error: err.errors
       })
     }
   }
