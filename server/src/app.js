@@ -2,7 +2,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
 const express = require('./config/express')
 const config = require('./config/env/config')
-const bot = require('./app/helper/autobot')
 
 const {
   sequelize
@@ -17,6 +16,7 @@ sequelize.sync({
     console.log('Server running at http://localhost:' + config.port)
   })
 
+const bot = require('./app/helper/autobot')
 bot()
 
 module.exports = app
