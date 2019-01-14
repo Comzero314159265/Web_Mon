@@ -1,11 +1,10 @@
 <template>
   <div class="page-container md-layout-column">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
-    <md-toolbar class="md-primary" style="position: fixed;">
+    <md-toolbar class="md-primary">
       <md-button class="md-icon-button" @click="showNavigation = true">
         <md-icon>menu</md-icon>
       </md-button>
-      <span class="md-title">Web Mon</span>
+      <span class="md-title">My Title</span>
 
       <div class="md-toolbar-section-end">
         <md-button @click="showSidepanel = true">Favorites</md-button>
@@ -73,19 +72,19 @@
     </md-drawer>
 
     <md-content>
-      <router-view/>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error quibusdam, non molestias et! Earum magnam, similique, quo recusandae placeat dicta asperiores modi sint ea repudiandae maxime? Quae non explicabo, neque.
     </md-content>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app',
-  data: () => ({
-    showNavigation: false,
-    showSidepanel: false
-  }),
-}
+  export default {
+    name: 'Temporary',
+    data: () => ({
+      showNavigation: false,
+      showSidepanel: false
+    })
+  }
 </script>
 
 <style>
@@ -103,15 +102,6 @@ export default {
   }
 
   .md-content {
-    position: relative;
-    top: 50px;
-    padding-top: 1.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    padding-bottom: 5rem;
-  }
-
-  .md-list-item:hover {
-    cursor: pointer;
+    padding: 16px;
   }
 </style>
