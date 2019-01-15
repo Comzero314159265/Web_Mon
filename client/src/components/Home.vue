@@ -5,85 +5,77 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="col-4 my-2" v-bind:class="[ item == 3 ? 'col-4' : item == 4 ? 'col-3' : 'col-6']" v-for="(item, index) in this.websites" v-bind:key="item.id">
-                        <fullscreen ref="fullscreen" @change="fullscreenChange">
-                            <md-card>
-                                <md-card-media>
-                                    <div class="embed-responsive embed-responsive-16by9" style="overflow: hidden;">
-                                        <vue-friendly-iframe :src='item.url' sandbox></vue-friendly-iframe>
-                                    </div>                    
-                                </md-card-media>
+                    <md-toolbar :md-elevation="1" style="z-index: 2;">
+                        <md-speed-dial class="md-top-right" md-direction="bottom" md-event="click">
+                            <md-speed-dial-target class="md-primary">
+                                <md-icon>view_module</md-icon>
+                            </md-speed-dial-target>
 
-                                <md-card-expand>
-                                    <md-card-actions md-alignment="space-between">
-                                    <div class="">
-                                        Source : <a href="" id="websrc">{{ item.url }}</a>
-                                    </div>
-                                        <md-button>
-                                                <md-button class="md-icon-button" @click="toggle(index)">
-                                                    <md-icon>fullscreen</md-icon>
+                            <md-speed-dial-content>
+                                <md-button class="md-icon-button" v-on:click="changecols(1)">
+                                    1
+                                </md-button>
+
+                                <md-button class="md-icon-button" v-on:click="changecols(2)">
+                                    2
+                                </md-button>
+
+                                <md-button class="md-icon-button" v-on:click="changecols(3)">
+                                    3
+                                </md-button>
+
+                                <md-button class="md-icon-button" v-on:click="changecols(6)">
+                                    6
+                                </md-button>
+
+                            </md-speed-dial-content>
+                        </md-speed-dial>
+                    </md-toolbar>
+                    <div class="container">
+                        <div class="row">
+                            <div class="my-2 px-1" v-bind:class="[ col == 1 ? 'col-md-12' : col == 2 ? 'col-md-6' : col == 3 ? 'col-md-4' : 'col-md-2']"
+                                v-for="(item, index) in this.websites" v-bind:key="item.id">
+                                <fullscreen ref="fullscreen" @change="fullscreenChange">
+                                    <md-card>
+                                        <md-card-media-cover md-solid>
+                                            <md-card-media >
+                                                <div class="embed-responsive embed-responsive-16by9" style="min-height: 150px;">
+                                                    <vue-friendly-iframe :src='item.url'></vue-friendly-iframe>
+                                                </div>
+                                            </md-card-media>
+
+                                            <md-card-area>
+                                                <md-card-actions md-alignment="space-between">
+                                                    <p>source: <a :href=item.url>{{  item.name }}</a></p>
+                                                    <md-button class="md-icon-button" @click="toggle(index)">
+                                                        <md-icon>fullscreen</md-icon>
+                                                    </md-button>
+                                                </md-card-actions>
+                                            </md-card-area>
+                                        </md-card-media-cover>
+                                    </md-card>
+<!-- 
+                                    <md-card>
+                                        <md-card-media>
+                                            <div class="embed-responsive embed-responsive-16by9" style="overflow: hidden;">
+                                                <vue-friendly-iframe :src='item.url' sandbox></vue-friendly-iframe>
+                                            </div>
+                                        </md-card-media>
+
+                                        <md-card-expand>
+                                            <md-card-actions md-alignment="space-between">
+                                                <md-button>
+                                                    <md-button class="md-icon-button" @click="toggle(index)">
+                                                        <md-icon>fullscreen</md-icon>
+                                                    </md-button>
                                                 </md-button>
-                                        </md-button>
-                                    </md-card-actions>
-                                </md-card-expand>
-                            </md-card>
-                        </fullscreen>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                            <div class="viewport">
-      <md-toolbar :md-elevation="1">
-        <span class="md-title">Full</span>
-      </md-toolbar>
+                                            </md-card-actions>
+                                        </md-card-expand>
+                                    </md-card> -->
+                                </fullscreen>
+                            </div>
+                        </div>
 
-      <md-list class="md-double-line">
-        <md-subheader>Phone</md-subheader>
-
-        <md-list-item>
-          <md-icon class="md-primary">phone</md-icon>
-
-          <div class="md-list-item-text">
-            <span>(650) 555-1234</span>
-            <span>Mobile</span>
-          </div>
-
-          <md-button class="md-icon-button md-list-action">
-            <md-icon>sms</md-icon>
-          </md-button>
-        </md-list-item>
-
-        <md-list-item class="md-inset">
-          <div class="md-list-item-text">
-            <span>(650) 555-1234</span>
-            <span>Mobile</span>
-          </div>
-
-          <md-button class="md-icon-button md-list-action">
-            <md-icon>sms</md-icon>
-          </md-button>
-        </md-list-item>
-
-        <md-divider></md-divider>
-        <md-subheader>Email</md-subheader>
-
-        <md-list-item>
-          <md-icon class="md-primary">email</md-icon>
-
-          <div class="md-list-item-text">
-            <span>aliconnors@example.com</span>
-            <span>Personal</span>
-          </div>
-        </md-list-item>
-
-        <md-list-item class="md-inset">
-          <div class="md-list-item-text">
-            <span>ali_connors@example.com</span>
-            <span>Work</span>
-          </div>
-        </md-list-item>
-      </md-list>
-    </div>
                     </div>
                 </div>
             </div>
@@ -104,23 +96,48 @@
     Vue.use(fullscreen)
     export default {
         name: 'Home',
+        mounted() {
+            alert()
+        },
         methods: {
-            toggle: function(index) {
+            toggle: function (index) {
                 this.$refs['fullscreen'][index].toggle() // recommended
                 // this.fullscreen = !this.fullscreen // deprecated
             },
-            fullscreenChange: function(fullscreen) {
+            fullscreenChange: function (fullscreen) {
                 this.fullscreen = fullscreen
+            },
+            changecols: function (col) {
+                this.col = col
+            },
+            fetch: function () {
+                
             }
         },
         data() {
             return {
                 fullscreen: false,
-                websites: [
-                    { id:1, name:'etda', url:'https://www.blognone.com' },
-                    { id:2, name:'etda', url:'https://www.set.or.th/' },
-                    { id:3, name:'etda', url:'https://mdbootstrap.com/plugins/vue/iframe//' },
-                    { id:4, name:'etda', url:'https://etda.or.th' },
+                col: 3,
+                websites: [{
+                        id: 1,
+                        name: 'etda',
+                        url: 'https://www.blognone.com'
+                    },
+                    {
+                        id: 2,
+                        name: 'etda',
+                        url: 'https://www.set.or.th/'
+                    },
+                    {
+                        id: 3,
+                        name: 'etda',
+                        url: 'https://mdbootstrap.com/plugins/vue/iframe//'
+                    },
+                    {
+                        id: 4,
+                        name: 'etda',
+                        url: 'https://www.etda.or.th'
+                    },
                 ],
                 item: 2
             }

@@ -1,7 +1,7 @@
 <template>
   <div class="page-container md-layout-column">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
-    <md-toolbar class="md-primary" style="position: fixed;">
+    <md-toolbar class="md-primary" style="position: fixed;z-index: 3;">
       <md-button class="md-icon-button" @click="showNavigation = true">
         <md-icon>menu</md-icon>
       </md-button>
@@ -12,7 +12,7 @@
       </div>
     </md-toolbar>
 
-    <md-drawer :md-active.sync="showNavigation" style="min-height: 100vh;">
+    <md-drawer :md-active.sync="showNavigation" style="min-height: 100vh;position: fixed;z-index: 999;">
       <md-toolbar class="md-transparent" md-elevation="0">
         <span class="md-title">My App name</span>
       </md-toolbar>
