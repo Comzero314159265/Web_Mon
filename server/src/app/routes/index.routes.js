@@ -7,4 +7,6 @@ module.exports = (app) => {
   // Website
   app.get('/website', website.index)
   app.post('/website', website.post)
+  app.delete('/website', website.delete)
+  app.put('/website', website.put)
 }

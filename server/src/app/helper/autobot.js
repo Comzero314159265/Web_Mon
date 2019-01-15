@@ -4,7 +4,7 @@ const axios = require('axios')
 const { Website } = require('../models')
 const { Available } = require('../models')
 
-const delay = 10000
+const delay = 1000 * 60 * 60
 var start = null
 var currentweb = null
 axios.interceptors.request.use(request => {

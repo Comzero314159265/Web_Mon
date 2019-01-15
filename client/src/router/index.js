@@ -9,6 +9,7 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
+      meta: { title: 'Web mon' },
       component: Home 
     }
   ]
