@@ -6,6 +6,7 @@ import routes from './router'
 
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
+import 'bootstrap/dist/bootstrap.min.css'
 
 Vue.config.productionTip = false
 Vue.use(VueMaterial)

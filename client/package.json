@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "bootstrap": "^4.2.1",
     "vue": "^2.5.21",
     "vue-fullscreen": "^2.1.3",
     "vue-material": "^1.0.0-beta-10.2",
