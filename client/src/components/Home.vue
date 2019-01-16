@@ -1,7 +1,5 @@
 <template>
     <div class="container-fluid">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-            integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
         <div class="row">
             <div class="col-md-12">
                 <div class="row">
@@ -50,10 +48,10 @@
                                             <md-card-area>
                                                 <md-card-actions md-alignment="space-between">
                                                     <p>source: <a :href=item.url class="text-white">{{ item.name }}</a></p>
-                                                    <md-button class="md-icon-button md-raised md-primary" v-on:click="deleteweb(item)">
+                                                    <md-button class="md-icon-button" v-on:click="confirmshow = true;currentWeb = item">
                                                         <md-icon>delete</md-icon>
                                                     </md-button>
-                                                    <md-button class="md-icon-button md-raised md-primary" v-on:click="editweb(item);showDialog=true;">
+                                                    <md-button class="md-icon-button md-primary" v-on:click="editweb(item);showDialog=true;">
                                                         <md-icon>edit</md-icon>
                                                     </md-button>
                                                     <md-button class="md-icon-button" @click="toggle(index)">
@@ -116,8 +114,11 @@
             </md-dialog>
         </div>
 
-        <md-snackbar :md-active.sync="websiteSaved">The user {{ lastWebsite }} was saved with success!</md-snackbar>
-        <md-snackbar :md-active.sync="responseError">{{ errormsg }}</md-snackbar>
+        <md-dialog-confirm :md-active.sync="confirmshow" md-title="Do you want to delete this?" md-confirm-text="Delete"
+            md-cancel-text="Cancel" @md-confirm="deleteweb()" />
+
+        <md-snackbar :md-active.sync="websiteSaved" class="bg-primary">{{ message }}</md-snackbar>
+        <md-snackbar :md-active.sync="responseError" class="bg-danger">{{ errormsg }}</md-snackbar>
 
     </div>
 </template>
@@ -126,7 +127,7 @@
     import fullscreen from 'vue-fullscreen'
     import Vue from 'vue'
     import WebsitesService from '@/services/WebsitesService'
-   
+
     import {
         validationMixin
     } from 'vuelidate'
@@ -139,18 +140,17 @@
     export default {
         name: 'Home',
         mixins: [validationMixin],
-         mounted() {
+        mounted() {
             //this.loading = true
             this.fetchdata()
         },
         methods: {
-            fetchdata: async function() {
+            fetchdata: async function () {
                 this.websites = (await WebsitesService.index()).data
                 this.loading = false
             },
             toggle: function (index) {
-                this.$refs['fullscreen'][index].toggle() // recommended
-                // this.fullscreen = !this.fullscreen // deprecated
+                this.$refs['fullscreen'][index].toggle()
             },
             fullscreenChange: function (fullscreen) {
                 this.fullscreen = fullscreen
@@ -166,7 +166,7 @@
                     } else {
                         temp = (await WebsitesService.post(this.form))
                     }
-                    this.lastWebsite = temp.data.name
+                    this.message = 'Update ' + temp.data.name + ' successfully'
                     this.websiteSaved = true
                     this.showDialog = false
                     this.clearForm()
@@ -188,13 +188,14 @@
                 this.form = Object.assign({}, website)
                 this.edit = true
             },
-            deleteweb: async function (website) {
-                let temp = Object.assign({}, website)
-                let res = null
+            deleteweb: async function () {
                 try {
-                    res = await WebsitesService.delete(temp)
-                    this.lastWebsite = res.data.name
+                    (await WebsitesService.delete(this.currentWeb))
+                    this.message = 'Delete data successfully'
                     this.websiteSaved = true
+                    this.showDialog = false
+                    this.clearForm()
+                    this.fetchdata()
                 } catch (error) {
                     if (error && error.response) {
                         let errormsg = ''
@@ -204,7 +205,9 @@
                         this.errormsg = (errormsg)
                         this.responseError = true
                     }
+
                 }
+
 
             },
             getValidationClass(fieldName) {
@@ -233,13 +236,16 @@
                 fullscreen: false,
                 col: 3,
                 websites: null,
+                currentWeb: null,
                 loading: false,
                 showDialog: false,
                 responseError: false,
                 websiteSaved: false,
                 errormsg: null,
-                lastWebsite: null,
+                message: null,
                 edit: false,
+                confirmshow: false,
+                confirm: false,
                 form: {
                     name: null,
                     url: null,

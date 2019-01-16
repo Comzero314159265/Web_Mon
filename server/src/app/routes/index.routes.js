@@ -6,7 +6,8 @@ module.exports = (app) => {
   app.post('/login', index.login)
   // Website
   app.get('/website', website.index)
+  app.get('/website/:id', website.show)
   app.post('/website', website.post)
-  app.delete('/website', website.delete)
+  app.delete('/website/:id', website.delete)
   app.put('/website', website.put)
 }

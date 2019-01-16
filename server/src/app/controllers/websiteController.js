@@ -12,6 +12,17 @@ module.exports = {
       })
     }
   },
+  async show (req, res) {
+    try {
+      let websites = null
+      websites = await Website.findById(req.params.id)
+      res.send(websites)
+    } catch (err) {
+      res.status(400).send({
+        error: err.errors
+      })
+    }
+  },
   async post (req, res) {
     try {
       const web = await Website.create(req.body)
@@ -34,8 +45,8 @@ module.exports = {
   },
   async delete (req, res) {
     try {
-      const web = await Website.findById(req.body.id).then(website => { return website.destroy() })
-      res.send(web)
+      (await Website.findById(req.params.id)).destroy()
+      res.status(200).send('success')
     } catch (err) {
       res.status(400).send({
         error: err.errors
