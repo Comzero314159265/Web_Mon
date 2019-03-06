@@ -1,11 +1,43 @@
-exports.render = (req, res) => {
-  res.send('Hello World')
+const axios = require('axios')
+const mime = require('mime')
+
+const regex = /\s+(href|src)=['"](.*?)['"]/g
+
+const getMimeType = url => {
+  if (url.indexOf('?') !== -1) {
+    url = url.split('?')[0]
+  }
+  return mime.getType(url) || 'text/html'
 }
 
-exports.login = (req, res) => {
-  console.log(req.body)
-  console.log('Email: ' + req.body.email)
-  console.log('Password:: ' + req.body.password)
+exports.index = (req, res) => {
+  const { url } = req.query
+  if (!url) {
+    res.type('text/html')
+    return res.end('You need to specify <code>url</code> query parameter')
+  }
 
-  res.json(req.body)
+  axios.get(url, { responseType: 'arraybuffer' })
+    .then(({ data }) => {
+      const urlMime = getMimeType(url)
+      if (urlMime === 'text/html') {
+        data = data.toString().replace(regex, (match, p1, p2) => {
+          let newUrl = ''
+          if (p2.indexOf('http') !== -1) {
+            newUrl = p2
+          } else if (p2.substr(0, 2) === '//') {
+            newUrl = 'http:' + p2
+          } else {
+            const searchURL = new URL(url)
+            newUrl = searchURL.protocol + '//' + searchURL.host + p2
+          }
+          return (' ' + p1 + '=' + req.protocol + '://' + req.hostname + ':3000' + '?url=' + newUrl)
+        })
+      }
+      console.log(urlMime)
+      res.type(urlMime)
+      res.send(data)
+    }).catch(error => {
+      console.log(error)
+    })
 }

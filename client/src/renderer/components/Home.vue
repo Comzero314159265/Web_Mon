@@ -1,18 +1,18 @@
 <template>
   <div id="container">
-    <div class="row">
+    <div class="row pt-5">
       <div class="col-md-12">
         <div class="row">
-
           <div class="col-md-4" v-for="(screen, index) in displays">
             <md-card>
               <md-card-media-cover md-solid>
+                <a href="">
                 <md-card-media>
                   <div class="embed-responsive embed-responsive-16by9" style="min-height: 150px;">
                     <!-- <vue-friendly-iframe :src="'localhost:3000/?url=' + item.url"></vue-friendly-iframe> -->
-                    <h3>Monitor</h3>
                   </div>
                 </md-card-media>
+                </a>
 
                 <md-card-area>
                   <md-card-actions md-alignment="space-between">
@@ -83,12 +83,16 @@
     required,
     url
   } from 'vuelidate/lib/validators'
+  import WebsitesService from '@/services/WebsitesService'
   const electron = require('electron')
   const BrowserWindow = electron.remote.BrowserWindow
 
   export default {
     name: 'Home',
     mixins: [validationMixin],
+    mounted () {
+      this.webfeteh()
+    },
     methods: {
       addWindow: function (index) {
         let window = new BrowserWindow({
@@ -101,7 +105,18 @@
             nodeIntegration: false
           }
         })
-        window.loadURL('https://www.etda.or.th/')
+        let url = this.popweb()
+        window.loadURL(url)
+      },
+      popweb () {
+        if (this.count === this.websites.length) {
+          this.count = 0
+        }
+        return this.websites[this.count++].url
+      },
+      webfeteh: async function () {
+        this.websites = (await WebsitesService.index()).data
+        this.loading = false
       },
       getValidationClass: function (fieldName) {
         const field = this.$v.form[fieldName]
@@ -125,6 +140,8 @@
     },
     data: function () {
       return {
+        count: 0,
+        websites: [],
         displays: electron.screen.getAllDisplays(),
         showDialog: false,
         sending: false,

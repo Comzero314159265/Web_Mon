@@ -5,10 +5,10 @@
       <md-button class="md-icon-button" @click="showNavigation = true">
         <md-icon>menu</md-icon>
       </md-button>
-      <span class="md-title">Web Mon</span>
+      <span class="md-title"><router-link :to="'/'" class="text-white nounderline">Web Mon</router-link></span>
 
       <div class="md-toolbar-section-end">
-        <md-button @click="showSidepanel = true">Favorites</md-button>
+        <router-link :to="'list'" class="text-white"><md-button >Favorites</md-button></router-link>
       </div>
     </md-toolbar>
         <md-drawer :md-active.sync="showNavigation" style="min-height: 100vh;position: fixed;z-index: 999;">
@@ -63,7 +63,7 @@
     padding-left: 0!important;
     padding-right: 0!important;
   }
-    .page-container {
+  .page-container {
     min-height: 100vh;
     overflow: hidden;
     position: relative;
@@ -77,14 +77,16 @@
 
   .md-content {
     position: relative;
-    top: 50px;
     padding-top: 1.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     padding-bottom: 5rem;
   }
 
   .md-list-item:hover {
     cursor: pointer;
+  }
+  .nounderline {
+    text-decoration: none !important
   }
 </style>

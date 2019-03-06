@@ -2,8 +2,7 @@ module.exports = (app) => {
   const index = require('../controllers/index.controller')
   const website = require('../controllers/websiteController')
 
-  app.get('/', index.render)
-  app.post('/login', index.login)
+  app.get('/', index.index)
   // Website
   app.get('/website', website.index)
   app.get('/website/:id', website.show)
