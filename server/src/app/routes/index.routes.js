@@ -3,6 +3,7 @@ module.exports = (app) => {
   const website = require('../controllers/websiteController')
 
   app.get('/', index.index)
+  app.get('/screenshot/:path', index.screenshot)
   // Website
   app.get('/website', website.index)
   app.get('/website/:id', website.show)

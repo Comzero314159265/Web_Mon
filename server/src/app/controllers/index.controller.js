@@ -41,3 +41,9 @@ exports.index = (req, res) => {
       console.log(error)
     })
 }
+
+exports.screenshot = (req, res) => {
+  const path = require('path')
+  const url = req.params.path
+  res.sendFile(path.join('img', url), { root: path.resolve(__dirname, '../../../') })
+}

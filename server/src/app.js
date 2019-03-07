@@ -16,7 +16,7 @@ sequelize.sync({
     console.log('Server running at http://localhost:' + config.port)
   })
 
-const bot = require('./app/helper/autobot')
-bot()
+// const bot = require('./app/helper/autobot')
+// bot()
 
 module.exports = app
