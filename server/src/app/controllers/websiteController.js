@@ -3,14 +3,6 @@ const captureWebsite = require('capture-website')
 const fs = require('fs')
 const path = require('path')
 
-// async function createFile (url, name) {
-//   const filename = path.join('img', name)
-//   if (fs.existsSync(filename)) {
-//     fs.rename(filename, filename + '(old)')
-//   }
-//   captureWebsite.file(url, filename)
-// }
-
 module.exports = {
   async index (req, res) {
     try {
@@ -25,17 +17,23 @@ module.exports = {
   },
   async show (req, res) {
     try {
-      let website = await Website.findById(req.params.id)
-      let url = website.url
-      let filename = 'screenshot_' + website.name + '.png'
-      let filepath = path.join('img', filename)
-      if (fs.existsSync(filepath)) {
-        let oldpath = path.join('img', 'old_' + filename)
-        fs.renameSync(filepath, oldpath)
-      }
-      await captureWebsite.file(url, filepath, { })
-      await Website.update({ screenshot: filename }, { where: { id: website.id } })
-      res.send(website)
+      Website.findById(req.params.id).then(website => {
+        let url = website.url
+        let filename = website.name + '_' + new Date().format('MMDDYYYYTHHmmss') + '.png'
+        let filepath = path.join('img', filename)
+        // check file exitst
+        if (fs.existsSync(filepath)) {
+          res.status(400).send('File exist')
+        }
+        // capture website
+        captureWebsite.file(url, filepath, { }).then((result) => {
+        //   Website.update({ currentVersion: filename }, { where: { id: website.id } }).then((website) => res.send(website))
+        //   // TODO: check if content update
+        //   // update prevVersion with currentVerion
+        //   // update CurrentVersion
+          res.send(result)
+        })
+      })
     } catch (err) {
       res.status(400).send({
         error: err.errors

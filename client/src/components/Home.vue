@@ -36,7 +36,6 @@
                             </div>
                             <div class="my-2 px-1" v-bind:class="[ col == 1 ? 'col-md-12' : col == 2 ? 'col-md-6' : col == 3 ? 'col-md-4' : 'col-md-2']"
                                 v-for="(item, index) in items" v-bind:key="item.id">
-                                <fullscreen ref="fullscreen" @change="fullscreenChange">
                                     <md-card>
                                         <!-- TODO: Classify Class of Danger -->
                                         <md-card-media-cover md-solid v-bind:class="[ 1 == 1 ? 'dangerClass' : '']">
@@ -56,7 +55,6 @@
                                                     <md-button class="md-icon-button" @click="deleteItem(index)">
                                                         <md-icon>delete</md-icon>
                                                     </md-button>
-                                                    <!-- <md-button class="md-icon-button" @click="toggle(index)" > -->
                                                     <md-button class="md-icon-button" v-on:click="open(item.url)">
                                                         <md-icon>fullscreen</md-icon>
                                                     </md-button>
@@ -64,7 +62,6 @@
                                             </md-card-area>
                                         </md-card-media-cover>
                                     </md-card>
-                                </fullscreen>
                             </div>
                         </div>
 
@@ -95,11 +92,9 @@
 </template>
 
 <script>
-    import fullscreen from 'vue-fullscreen'
     import Vue from 'vue'
     import WebsitesService from '@/services/WebsitesService'
 
-    Vue.use(fullscreen)
     export default {
         name: 'Home',
         ready() { alert() },
@@ -111,12 +106,6 @@
             fetchdata: async function () {
                 this.websites = (await WebsitesService.index()).data
                 this.loading = false
-            },
-            toggle: function (index) {
-                this.$refs['fullscreen'][index].toggle()
-            },
-            fullscreenChange: function (fullscreen) {
-                this.fullscreen = fullscreen
             },
             changecols: function (col) {
                 this.col = col
