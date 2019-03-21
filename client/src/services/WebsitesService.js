@@ -12,5 +12,8 @@ export default {
   },
   delete (website) {
     return Api().delete('website/' + website.id)
+  },
+  show (id) {
+    return Api().get('website/' + id)
   }
 }

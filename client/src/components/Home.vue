@@ -38,11 +38,11 @@
                                 v-for="(item, index) in items" v-bind:key="item.id">
                                     <md-card>
                                         <!-- TODO: Classify Class of Danger -->
-                                        <md-card-media-cover md-solid v-bind:class="[ 1 == 1 ? 'dangerClass' : '']">
+                                        <md-card-media-cover md-solid v-bind:class="[ item.level == 0 ? 'normalClass' : item.level == 1 ? 'cautionClass' : item.level == 2 ? 'warningClass' : item.level == 3 ? 'dangerClass' : '']">
                                             <md-card-media>
                                                 <div v-on:click="open(item.url)" class="hover">
                                                     <div class="" style="min-height: 150px;">
-                                                        <img :src='"http://localhost:3000/screenshot/"+item.screenshot'
+                                                        <img :src=' imgDefault || "http://localhost:3000/screenshot/"+item.current'
                                                             alt="" class="img-fluid" />
                                                     </div>
                                                     <h1 class="text-danger">{{ item.class }}</h1>
@@ -74,7 +74,7 @@
             <md-list>
                 <md-subheader>List of websites</md-subheader>
                 <md-list-item v-for="website in websites" v-bind:key="website.id">
-                    <md-checkbox v-model="items" :value=website />
+                    <md-checkbox v-model="temps" v-bind:key="website.id" v-on:change="update" :value=website />
                     <span class="md-list-item-text">{{ website.name }} ({{ website.url }})</span>
                 </md-list-item>
 
@@ -92,18 +92,31 @@
 </template>
 
 <script>
-    import Vue from 'vue'
     import WebsitesService from '@/services/WebsitesService'
 
     export default {
         name: 'Home',
-        ready() { alert() },
         mounted() {
-            //this.loading = true
             this.fetchdata()
+            this.interval = setInterval(this.update, this.refeshTime)
         },
         methods: {
+            update(){
+                if (this.temps.length > 0){
+                    this.items = this.temps
+                    this.loading = true
+                    this.imgDefault = 'http://localhost:3000/screenshot/image-not-found.png'
+                    Promise.all(this.temps.map(x => WebsitesService.show(x.id))).then(v => {
+                        this.items = v.map(x => x.data)
+                        this.imgDefault = ''
+                        this.loading = false
+                    })
+                }else{
+                    this.items = []
+                }
+            },
             fetchdata: async function () {
+                this.loading = true
                 this.websites = (await WebsitesService.index()).data
                 this.loading = false
             },
@@ -120,10 +133,10 @@
                 popup.moveTo(0, 0)
             },
             addItem: function () {
-                this.items.push(this.websites[0])
-                console.log(this.items)
+                this.temps.push(this.websites[0])
             },
             deleteItem: function (index) {
+                this.temps.splice(index, 1)
                 this.items.splice(index, 1)
             }
         },
@@ -131,14 +144,18 @@
             return {
                 fullscreen: false,
                 col: 3,
-                websites: [],
                 responseError: false,
                 responseSuccess: false,
                 errormsg: null,
                 message: null,
                 loading: false,
                 showDialog: false,
-                items: []
+                interval: null,
+                refeshTime: 1000 * 60 * 5,
+                items: [],
+                temps: [],
+                websites: [],
+                imgDefault: ''
             }
         }
     }
@@ -155,8 +172,18 @@
     }
 
     .warningClass {
-        border-style: solid;
-        border-color: orange;
+        box-shadow: 0 0 10px 1px orange;
+        transition: 0.3s;
+    }
+
+    .cautionClass {
+        box-shadow: 0 0 10px 1px yellow;
+        transition: 0.3s;
+    }
+
+    .normalClass {
+        box-shadow: 0 0 10px 1px green;
+        transition: 0.3s;
     }
 
     .md-action {
