@@ -9,10 +9,10 @@ Webmon is blah blah blah
   <img height="50" src="https://camo.githubusercontent.com/3d884d889bb7e345ca5464d55bc24c80a36c7b1b/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f372f37652f4e6f64652e6a735f6c6f676f5f323031352e737667">
 </p>
 ## Threshold Configuration
-* Level 0
-* Level 1
-* Level 2
-* Level 3
+* Level 0 : Normal level
+* Level 1 : Caution level
+* Level 2 : Alert level 
+* Level 3 : Critical level
 
 ## Defacement checklist
 - [x] Text modified percentage:
@@ -20,4 +20,4 @@ Webmon is blah blah blah
 - [] Script defacement: 
 - [] Anchor defacement: 
 - [] Iframe defacement: 
-- [] Link defacement: 
+- [] Link defacement:
