@@ -17,7 +17,7 @@ Webmon is blah blah blah
 ## Defacement checklist
 - [x] Text modified percentage:
 - [x] Image defacement: 
-- [] Script defacement: 
-- [] Anchor defacement: 
-- [] Iframe defacement: 
-- [] Link defacement:
+- [ ] Script defacement: 
+- [ ] Anchor defacement: 
+- [ ] Iframe defacement: 
+- [ ] Link defacement:
