@@ -17,6 +17,11 @@ export default new Router({
       component: require('@/components/List').default
     },
     {
+      path: '/setting',
+      name: 'Setting',
+      component: require('@/components/Setting').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

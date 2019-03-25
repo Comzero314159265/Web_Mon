@@ -1,199 +1,192 @@
 <template>
-  <div>
-    <md-table>
-      <md-table-row>
-        <md-table-head md-numeric>ID</md-table-head>
-        <md-table-head>Name</md-table-head>
-        <md-table-head>Url</md-table-head>
-        <md-table-head>Action</md-table-head>
-      </md-table-row>
+  <v-layout row wrap mt-5>
+    <v-flex xs12>
+      <v-data-table 
+      :headers="headers"
+      :items="websites"
+      disable-initial-sort
+      class="elevation-1 text-md-center">
+        <template v-slot:items="website" >
+          <td >{{ website.item.id }}</td>
+          <td>{{ website.item.name }}</td>
+          <td>{{ website.item.url }}</td>
+          <td >
+            <v-btn @click="edit(website.item);editDialog = true">
+              <v-icon>
+                edit
+              </v-icon>
+            </v-btn>
+            <v-btn @click="currentWeb = Object.assign({}, website.item);confirmDialog = true;">
+              <v-icon>
+                delete
+              </v-icon>
+            </v-btn>
 
-      <md-table-row v-for="(web) in websites" v-bind:key="web.id">
-        <md-table-cell md-numeric>{{ web.id }}</md-table-cell>
-        <md-table-cell>{{ web.name }}</md-table-cell>
-        <md-table-cell>{{ web.url }}</md-table-cell>
-        <md-table-cell>
-          <md-button class="md-icon-button" v-on:click="editweb(web);showDialog=true;">
-            <md-icon>edit</md-icon>
-          </md-button>
-          <md-button class="md-icon-button" v-on:click="confirmshow = true;currentWeb = web">
-            <md-icon>delete</md-icon>
-          </md-button>
-        </md-table-cell>
-      </md-table-row>
-    </md-table>
+          </td>
+        </template>
+      </v-data-table>
+      <v-btn
+        v-model="fab"
+        color="primary"
+        dark
+        fab
+        fixed
+        bottom
+        right
+        @click="clear();editDialog=true;"
+        >
+      <v-icon>add</v-icon>
+      </v-btn>
 
-    <md-dialog :md-active.sync="showDialog" md-dynamic-height style="width:40%;">
-      <div class="px-3">
-        <form novalidate class="row" @submit.prevent="validateWebsite">
-          <md-card class="col-md-12">
-            <md-card-header>
-              <div class="md-title">Add Website</div>
-            </md-card-header>
 
-            <md-card-content>
-              <div class="row">
-                <div class="col-md-12">
-                  <md-field :class="getValidationClass('name')">
-                    <label for="name">Name</label>
-                    <md-input name="name" id="name" autocomplete="given-name" v-model="form.name" :disabled="sending" />
-                    <span class="md-error" v-if="!$v.form.name.required">The name is
-                      required</span>
-                  </md-field>
-                </div>
-              </div>
+      <!-- Edit Dialog -->
+      <v-dialog v-model="editDialog" max-width="500px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Edit Website</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout row wrap>
+                <v-flex md12>
+                  <v-text-field label="Name*" required v-model="pickItem.name"></v-text-field>
+                </v-flex>
+              </v-layout>
+              <v-layout row wrap>
+                <v-flex md12>
+                  <v-text-field label="Url*" required v-model="pickItem.url"></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="editDialog = false;">
+              Close
+            </v-btn>
+            <v-btn @click="save()">
+              {{ editing ? 'Update' : 'Add Website' }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
-              <md-field :class="getValidationClass('url')">
-                <label for="url">Url</label>
-                <md-input type="url" name="url" id="url" autocomplete="url" v-model="form.url" />
-                <span class="md-error" v-if="!$v.form.url.required">The url is required</span>
-                <span class="md-error" v-if="!$v.form.url.url">Invalid url</span>
+      <!-- Confirm Dialog -->
+      <v-dialog v-model="confirmDialog" max-width="290">
+        <v-card>
+          <v-card-title class="headline">Confirm Dialog</v-card-title>
+          <v-card-text>
+            Do you want to delete this?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn flat @click="confirmDialog = false">Disagree</v-btn>
+            <v-btn color="green darken-1" flat @click="deleteWeb">Agree</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
-              </md-field>
-            </md-card-content>
 
-            <md-card-actions>
-              <md-button class="md-primary" @click="showDialog = false">Close</md-button>
-              <md-button type="submit" class="md-primary" :disabled="sending">{{ edit ? 'Update' : 'Add Website' }}</md-button>
-            </md-card-actions>
-          </md-card>
-        </form>
-      </div>
-    </md-dialog>
+    </v-flex>
+    
+  
+  </v-layout>
 
-    <md-dialog-confirm :md-active.sync="confirmshow" md-title="Do you want to delete this?" md-confirm-text="Delete"
-      md-cancel-text="Cancel" @md-confirm="deleteweb()" />
-
-    <md-snackbar :md-active.sync="websiteSaved" class="bg-primary">{{ message }}</md-snackbar>
-    <md-snackbar :md-active.sync="responseError" class="bg-danger">{{ errormsg }}</md-snackbar>
-
-    <md-button class="md-fab" style="position:fixed;bottom:3%;right:3%;" v-on:click="clearForm();showDialog=true;edit=false">
-      <md-icon>add</md-icon>
-    </md-button>
-  </div>
 </template>
 <script>
-  import WebsitesService from '@/services/WebsitesService'
-  import Home from './Home.vue';
-  import {
-    validationMixin
-  } from 'vuelidate'
-  import {
-    required,
-    url
-  } from 'vuelidate/lib/validators'
+import WebsitesService from '@/services/WebsitesService'
+import Store from '@/services/Store'
 
-  export default {
-    name: 'List',
-    mixins: [validationMixin],
-    data: function () {
-      return {
-        websites: [],
-        showDialog: false,
-        edit: false,
-        sending: false,
-        message: null,
-        errormsg: null,
-        websiteSaved: false,
-        responseError: false,
-        confirmshow: false,
-        form: {
-          name: null,
-          url: null
-        }
-      }
-    },
-    validations: {
-      form: {
-        name: {
-          required
-        },
-        url: {
-          required,
-          url
-        }
-      }
-    },
-    mounted() {
-      this.fetchdata()
-    },
-    methods: {
-      fetchdata: async function () {
-        this.websites = (await WebsitesService.index()).data
-      },
-      clearForm() {
-        this.$v.$reset()
-        this.form.name = null
-        this.form.url = null
-      },
-      getValidationClass(fieldName) {
-        const field = this.$v.form[fieldName]
-        if (field) {
-          return {
-            'md-invalid': field.$invalid && field.$dirty
-          }
-        }
-      },
-      validateWebsite() {
-        this.$v.$touch()
-        if (!this.$v.$invalid) {
-          this.add()
-        }
-      },
-      add: async function () {
-        try {
-          var temp = null
-          if (this.edit) {
-            temp = (await WebsitesService.put(this.form))
-          } else {
-            temp = (await WebsitesService.post(this.form))
-          }
-          this.message = 'Update ' + temp.data.name + ' successfully'
-          this.websiteSaved = true
-          this.showDialog = false
-          this.clearForm()
-          this.fetchdata()
-          Home.data().websites = this.websites
-        } catch (error) {
-          if (error && error.response) {
-            let errormsg = ''
-            error.response.data.error.forEach(element => {
-              errormsg += element.message
-            })
-            this.errormsg = (errormsg)
-            this.responseError = true
-          }
+export default {
+  mounted() {
 
-        }
+  },
+  data() {
+    return {
+      headers: [
+        {text: 'ID', align: 'center', value: 'id'},
+        {text: 'Name', align: 'center', value: 'name'},
+        {text: 'Url', align: 'center', value: 'url'},
+        {text: 'Action', align: 'center', value: ''},
+      ],
+      fab: false,
+      confirmDialog: false,
+      editDialog: false,
+      pickItem: {
+        name: null,
+        url: null
       },
-      editweb: function (website) {
-        this.clearForm()
-        this.form = Object.assign({}, website)
-        this.edit = true
-      },
-      deleteweb: async function () {
-        try {
-          (await WebsitesService.delete(this.currentWeb))
-          this.message = 'Delete data successfully'
-          this.websiteSaved = true
-          this.showDialog = false
-          this.clearForm()
-          this.fetchdata()
-        } catch (error) {
-          if (error && error.response) {
-            let errormsg = ''
-            error.response.data.error.forEach(element => {
-              errormsg += element.message
-            })
-            this.errormsg = (errormsg)
-            this.responseError = true
-          }
-
-        }
-
-
-      },
-
+      editing: false,
+      currentWeb: null
     }
-  }
+  },
+  methods: {
+    async deleteWeb() {
+      try{
+        (await WebsitesService.delete(this.currentWeb))
+        Store.commit('updateMessage', 'Data Deleted !!!')
+        Store.commit('updateSucessAlert',true)
+        this.update()
+      }catch(error){
+        Store.commit('updateMessage',error)
+        Store.commit('updateErrorAlert',true)
+      }finally{
+        this.confirmDialog = false
+      }
+    },
+    clear(){
+      this.pickItem.id = null
+      this.pickItem.name = null
+      this.pickItem.url = null
+      this.editing = false
+    },
+    edit(website){
+      this.clear()
+      this.pickItem = Object.assign({}, website)
+      this.editing = true
+    },
+    async save(){
+      if(!this.pickItem.name || !this.this.url)
+        return 
+      try {
+        var temp = null
+        Store.commit('updateLoading',true)
+        if (this.editing) {
+          temp = (await WebsitesService.put(this.pickItem))
+          if(temp)
+            Store.commit('updateMessage', 'Data Updated !!!')
+        } else {
+          temp = (await WebsitesService.post(this.pickItem))
+          if(temp)
+            Store.commit('updateMessage', 'Data Saved !!!')
+        }
+        // console.log(temp)
+        Store.commit('updateSuccessAlert',true)
+        this.update()
+      }catch(error){
+        Store.commit('updateMessage',error)
+        Store.commit('updateErrorAlert',true)
+      }finally{
+        Store.commit('updateLoading',false)
+        this.editDialog = false
+      }
+    },
+    async update () {
+        try {
+          this.loading = true
+          Store.commit('updateWebsites', (await WebsitesService.index()).data)
+        } catch (error) {
+          this.meassage = error
+          this.errorAlert = true
+        } finally {
+          this.loading = false
+        }
+    }
+  },
+  computed: {
+    websites() {
+      return Store.state.websites
+    }
+  },
+}
 </script>

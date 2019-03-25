@@ -1,192 +1,261 @@
 <template>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    <md-toolbar :md-elevation="1" style="z-index: 2;">
-                        <md-speed-dial class="md-top-right" md-direction="bottom">
-                            <md-speed-dial-target class="md-primary">
-                                <md-icon>view_module</md-icon>
-                            </md-speed-dial-target>
+ <div>
+    <v-layout row wrap mt-5>
+      <v-flex xs12>
+        <v-toolbar style="z-index:1;">
+          <v-spacer></v-spacer>
+          <v-speed-dial
+          v-model = "fab"
+          :right = true
+          :top = true
+          :direction = "'bottom'"
+          :transition = "'slide-y-reverse-transition'"
+          >
+          <template v-slot:activator>
+          <v-btn
+              color="primary"
+              dark
+              fab>
+            <v-icon>view_module</v-icon>
+            </v-btn>
+          </template>
+          <v-btn
+          fab
+          dark
+          color="white"
+          class="black--text"
+          @click="cols = 1">
+          1
+          </v-btn>
+                    <v-btn
+          fab
+          dark
+          color="white"
+          class="black--text"
+          @click="cols = 2">
+          2
+          </v-btn>
+          <v-btn
+          fab
+          dark
+          color="white"
+          class="black--text"
+          @click="cols = 3">
+          3
+          </v-btn>
+          <v-btn
+          fab
+          dark
+          color="white"
+          class="black--text"
+          @click="cols = 6">
+          6
+          </v-btn>
+          </v-speed-dial>
+        </v-toolbar>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap mt-1>
+      <!-- Website items -->
+      <v-flex v-for="item in items" 
+        v-bind:key="item.id"
+        v-bind:class="getCols()" px-1 py-1>
+        <v-card>
+          <!-- screenshot -->
+          <v-img :src="imageUrl(item.current)">
+          </v-img>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="viewWeb(item.url)">
+              <v-icon>fullscreen</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    
+    <!-- Modal -->
+    <v-dialog
+      v-model="dialog"
+      scrollable
+      width="500">
+      <v-card>
+        <v-card-title
+          class="headline grey lighten-2"
+          primary-title
+        >
+        List of websites
+        </v-card-title>
+        <v-card-text style="max-height: 300px;">
+          <v-layout row wrap>
+            <v-flex xs-10>
+              <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+              ></v-text-field>
+              <v-divider></v-divider>
+              <v-checkbox 
+                v-model="items" 
+                v-for="item in filteredList" 
+                :label="item.name" 
+                v-bind:key="item.id"
+                :value="item"
+                hide-details
+                @change="saveItem">
+              </v-checkbox>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            flat
+            @click="dialog = false"
+          >
+            accept
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-                            <md-speed-dial-content>
-                                <md-button class="md-icon-button" v-on:click="changecols(1)">
-                                    1
-                                </md-button>
-
-                                <md-button class="md-icon-button" v-on:click="changecols(2)">
-                                    2
-                                </md-button>
-
-                                <md-button class="md-icon-button" v-on:click="changecols(3)">
-                                    3
-                                </md-button>
-
-                                <md-button class="md-icon-button" v-on:click="changecols(6)">
-                                    6
-                                </md-button>
-
-                            </md-speed-dial-content>
-                        </md-speed-dial>
-                    </md-toolbar>
-                    <div class="container-fluid mx-5">
-                        <div class="row">
-                            <div class="" style="position:fixed;top:50%;left:50%;right:50%;bottom:50%;z-index: 99;">
-                                <md-progress-spinner :md-diameter="100" :md-stroke="10" md-mode="indeterminate" v-if="loading"></md-progress-spinner>
-                            </div>
-                            <div class="my-2 px-1" v-bind:class="[ col == 1 ? 'col-md-12' : col == 2 ? 'col-md-6' : col == 3 ? 'col-md-4' : 'col-md-2']"
-                                v-for="(item, index) in items" v-bind:key="item.id">
-                                    <md-card>
-                                        <!-- TODO: Classify Class of Danger -->
-                                        <md-card-media-cover md-solid v-bind:class="[ item.level == 0 ? 'normalClass' : item.level == 1 ? 'cautionClass' : item.level == 2 ? 'warningClass' : item.level == 3 ? 'dangerClass' : '']">
-                                            <md-card-media>
-                                                <div v-on:click="open(item.url)" class="hover">
-                                                    <div class="" style="min-height: 150px;">
-                                                        <img :src=' imgDefault || "http://localhost:3000/screenshot/"+item.current'
-                                                            alt="" class="img-fluid" />
-                                                    </div>
-                                                    <h1 class="text-danger">{{ item.class }}</h1>
-                                                </div>
-                                            </md-card-media>
-
-                                            <md-card-area>
-                                                <md-card-actions md-alignment="space-between">
-                                                    <p>source: <a :href=item.url class="text-white">{{ item.name }}</a></p>
-                                                    <md-button class="md-icon-button" @click="deleteItem(index)">
-                                                        <md-icon>delete</md-icon>
-                                                    </md-button>
-                                                    <md-button class="md-icon-button" v-on:click="open(item.url)">
-                                                        <md-icon>fullscreen</md-icon>
-                                                    </md-button>
-                                                </md-card-actions>
-                                            </md-card-area>
-                                        </md-card-media-cover>
-                                    </md-card>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <md-dialog :md-active.sync="showDialog">
-            <md-list>
-                <md-subheader>List of websites</md-subheader>
-                <md-list-item v-for="website in websites" v-bind:key="website.id">
-                    <md-checkbox v-model="temps" v-bind:key="website.id" v-on:change="update" :value=website />
-                    <span class="md-list-item-text">{{ website.name }} ({{ website.url }})</span>
-                </md-list-item>
-
-            </md-list>
-        </md-dialog>
-
-        <md-button class="md-fab" style="position:fixed;bottom:3%;right:3%;" @click="showDialog = true">
-            <md-icon>add</md-icon>
-        </md-button>
-
-        <md-snackbar :md-active.sync="responseSuccess" class="bg-primary">{{ message }}</md-snackbar>
-        <md-snackbar :md-active.sync="responseError" class="bg-danger">{{ errormsg }}</md-snackbar>
-
+    <div style="position:fixed;top:50%;left:50%;right:50%;bottom:50%;z-index: 99;">
+      <v-progress-circular
+        :size="100"
+        color="primary"
+        indeterminate
+        v-if="loading"
+      ></v-progress-circular>
     </div>
+    <v-snackbar
+      color="success"
+      v-model="successAlert"
+      :timeout="6000">
+      {{ meassage }}
+      <v-btn
+        flat
+        @click="successAlert = false"
+      >
+      close
+      </v-btn>
+    </v-snackbar>
+
+    <v-snackbar
+      color="error"
+      v-model="errorAlert"
+      :timeout="6000">
+      {{ meassage }}
+      <v-btn
+        flat
+        @click="errorAlert = false"
+      >close</v-btn>
+    </v-snackbar>
+
+      <v-btn
+        v-model="fab"
+        color="primary"
+        dark
+        fab
+        fixed
+        bottom
+        right
+        @click="dialog = true"
+      >
+      <v-icon>add</v-icon>
+      </v-btn>
+  </div>
 </template>
-
 <script>
-    import WebsitesService from '@/services/WebsitesService'
+  import WebsitesService from '@/services/WebsitesService'
+  import Store from '@/services/Store'
 
-    export default {
-        name: 'Home',
-        mounted() {
-            this.fetchdata()
-            this.interval = setInterval(this.update, this.refeshTime)
-        },
-        methods: {
-            update(){
-                if (this.temps.length > 0){
-                    this.items = this.temps
-                    this.loading = true
-                    this.imgDefault = 'http://localhost:3000/screenshot/image-not-found.png'
-                    Promise.all(this.temps.map(x => WebsitesService.show(x.id))).then(v => {
-                        this.items = v.map(x => x.data)
-                        this.imgDefault = ''
-                        this.loading = false
-                    })
-                }else{
-                    this.items = []
-                }
-            },
-            fetchdata: async function () {
-                this.loading = true
-                this.websites = (await WebsitesService.index()).data
-                this.loading = false
-            },
-            changecols: function (col) {
-                this.col = col
-            },
-            open: function (url) {
-                var params = [
-                    'height=' + screen.availHeight,
-                    'width=' + screen.availWidth,
-                    'fullscreen=yes'
-                ].join(',')
-                var popup = window.open(url, 'popup_window', params)
-                popup.moveTo(0, 0)
-            },
-            addItem: function () {
-                this.temps.push(this.websites[0])
-            },
-            deleteItem: function (index) {
-                this.temps.splice(index, 1)
-                this.items.splice(index, 1)
-            }
-        },
-        data() {
-            return {
-                fullscreen: false,
-                col: 3,
-                responseError: false,
-                responseSuccess: false,
-                errormsg: null,
-                message: null,
-                loading: false,
-                showDialog: false,
-                interval: null,
-                refeshTime: 1000 * 60 * 5,
-                items: [],
-                temps: [],
-                websites: [],
-                imgDefault: ''
-            }
+  export default {
+    name: 'Home',
+    mounted() {
+      this.fetch()
+    },
+    data() {
+      return {
+        fab: false,
+        fabadd: false,
+        loading: false,
+        meassage: '',
+        successAlert: false,
+        errorAlert: false,
+        dialog: false,
+        search: '',
+        cols: 3,
+        items: []
+      }
+    },
+    computed: {
+      filteredList () {
+        return this.websites.filter(item => {
+          return item.name.toLowerCase()
+          .includes(this.search.toLowerCase())
+        })
+      },
+      websites() {
+        return Store.state.websites
+      }
+    },
+    watch: {
+      dialog (val){
+        if(!val){
+          this.saveItem()
         }
-    }
+      }
+    },
+    methods: {
+      fetch(){
+        try{
+          Store.commit('updateLoading',true)
+          let temps = (localStorage.getItem('items'))
+          if(temps)
+            this.items = JSON.parse(temps)
+        }catch(error){
+          Store.commit('updateMessage',error)
+          Store.commit('updateErrorAlert',true)
+        }finally{
+          Store.commit('updateLoading',false)
+        }
+      },
+      saveItem(){
+        localStorage.setItem('items', JSON.stringify(this.items))
+      },
+      imageUrl (url) {
+        if(url){
+          return 'http://localhost:3000/screenshot/' + url
+        }else{
+          return './image-not-found.png'
+        }
+      },
+
+      getCols(){
+        return 'xs' + (12 / this.cols)
+      },
+
+      viewWeb (url) {
+        var params = [
+          'height=' + screen.availHeight,
+          'width=' + screen.availWidth,
+          'fullscreen=yes'
+          ].join(',')
+          var popup = window.open(url, 'popup_window', params)
+          popup.moveTo(0, 0)
+      }
+    },
+  }
 </script>
-
 <style>
-    .hover:hover {
-        cursor: pointer;
-    }
+  #create .v-speed-dial {
+    position: absolute;
+  }
 
-    .dangerClass {
-        box-shadow: 0 0 10px 1px red;
-        transition: 0.3s;
-    }
-
-    .warningClass {
-        box-shadow: 0 0 10px 1px orange;
-        transition: 0.3s;
-    }
-
-    .cautionClass {
-        box-shadow: 0 0 10px 1px yellow;
-        transition: 0.3s;
-    }
-
-    .normalClass {
-        box-shadow: 0 0 10px 1px green;
-        transition: 0.3s;
-    }
-
-    .md-action {
-        padding: 0!important;
-    }
+  #create .v-btn--floating {
+    position: relative;
+  }
 </style>
