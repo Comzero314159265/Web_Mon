@@ -17,9 +17,9 @@ Webmon is blah blah blah
 * Level 3 : Critical level
 
 ## Defacement checklist
-- [x] Text modified percentage:
-- [x] Image defacement: 
-- [ ] Script defacement: 
-- [ ] Anchor defacement: 
-- [ ] Iframe defacement: 
-- [ ] Link defacement:
+- [ ] Text modified percentage:
+- [ ] Image modified : 
+- [ ] Script modified : 
+- [ ] Anchor modified : 
+- [ ] Iframe modified : 
+- [ ] Link modified :
