@@ -215,7 +215,7 @@
           Store.commit('updateLoading',true)
           let temps = (localStorage.getItem('items'))
           if(temps)
-            this.items = JSON.parse(temps)
+            console.log(JSON.parse(temps))
         }catch(error){
           Store.commit('updateMessage',error)
           Store.commit('updateErrorAlert',true)
