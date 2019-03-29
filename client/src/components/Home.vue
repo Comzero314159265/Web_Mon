@@ -3,6 +3,7 @@
     <v-layout row wrap mt-5>
       <v-flex xs12>
         <v-toolbar style="z-index:1;">
+          <h3> Your page on monitor <span class="red--text">{{ items.length }}</span> / <span class="red--text">{{ items.length }}</span> page </h3>
           <v-spacer></v-spacer>
           <v-speed-dial
           v-model = "fab"
@@ -51,6 +52,14 @@
           @click="cols = 6">
           6
           </v-btn>
+          <v-btn
+          fab
+          dark
+          color="white"
+          class="black--text"
+          @click="cols = 8">
+          8
+          </v-btn>
           </v-speed-dial>
         </v-toolbar>
       </v-flex>
@@ -63,19 +72,29 @@
         <v-card>
           <!-- screenshot -->
           <v-img :src="imageUrl(item.current)">
+            <v-layout
+              right
+              fill-height
+              pa-3
+              red--text
+            >
+            </v-layout>
+            <!-- alert -->
+
           </v-img>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="viewWeb(item.url)">
-              <v-icon>fullscreen</v-icon>
+          <v-card-actions >
+            <v-spacer></v-spacer  >
+            <v-btn @click="viewWeb(item.url)" relative>
+              <v-icon >fullscreen</v-icon>
             </v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
     </v-layout>
     
+
     <!-- Modal -->
-    <v-dialog
+    <!-- <v-dialog
       v-model="dialog"
       scrollable
       width="500">
@@ -99,7 +118,7 @@
               <v-divider></v-divider>
               <v-checkbox 
                 v-model="items" 
-                v-for="item in filteredList" 
+                v-for="item in websites" 
                 :label="item.name" 
                 v-bind:key="item.id"
                 :value="item"
@@ -120,7 +139,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
 
     <div style="position:fixed;top:50%;left:50%;right:50%;bottom:50%;z-index: 99;">
       <v-progress-circular
@@ -175,7 +194,7 @@
   export default {
     name: 'Home',
     mounted() {
-      this.fetch()
+
     },
     data() {
       return {
@@ -187,8 +206,14 @@
         errorAlert: false,
         dialog: false,
         search: '',
-        cols: 3,
-        items: []
+        cols: {
+          get: function() {
+            return this.$store.state.cols 
+          },
+          set: function(val) {
+            this.$store.commit('setCols', val)
+          }
+        }
       }
     },
     computed: {
@@ -198,7 +223,7 @@
           .includes(this.search.toLowerCase())
         })
       },
-      websites() {
+      items() {
         return Store.state.websites
       }
     },
@@ -210,6 +235,9 @@
       }
     },
     methods: {
+      interval(time){
+
+      },
       fetch(){
         try{
           Store.commit('updateLoading',true)
@@ -233,9 +261,8 @@
           return './image-not-found.png'
         }
       },
-
       getCols(){
-        return 'xs' + (12 / this.cols)
+        return 'xs' + Math.floor(12 / this.cols)
       },
 
       viewWeb (url) {
@@ -250,12 +277,18 @@
     },
   }
 </script>
-<style>
+<style scope>
   #create .v-speed-dial {
     position: absolute;
   }
 
   #create .v-btn--floating {
     position: relative;
+  }
+
+  .anomaly {
+    position: relative;
+    left: 50;
+    content: 'x'
   }
 </style>

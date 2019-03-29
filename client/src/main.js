@@ -3,18 +3,29 @@ import App from './App.vue'
 import axios from 'axios'
 import router from './router'
 import Vuetify from 'vuetify'
-import io from 'socket.io-client'
+import VueSocketIO from 'vue-socket.io'
+import SocketIO from 'socket.io-client';
+import store from './services/Store'
 
-Vue.http = Vue.prototype.$http = axios
+Vue.prototype.$http = axios
+Vue.prototype.$store = store
+
 Vue.config.productionTip = false
 Vue.use(Vuetify)
 
-const socket = io('http://localhost:3000')
-socket.on('websites', (data) => {
-  console.log(data)
-})
+Vue.use(new VueSocketIO({
+  debug: false,
+  connection: SocketIO('http://localhost:3000', {}),
+  vuex: {
+    store,
+    actionPrefix: 'SOCKET_',
+    mutationsPrefix: 'SOCKET_'
+  }
+  })
+)
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

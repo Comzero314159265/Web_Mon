@@ -142,25 +142,21 @@ export default {
     },
     edit(website){
       this.clear()
-      this.pickItem = Object.assign({}, website)
+      this.pickItem = Object.assign({}, { id:website.id , name:website.name, url:website.url })
       this.editing = true
     },
     async save(){
-      if(!this.pickItem.name || !this.this.url)
-        return 
+      console.log(this.pickItem)
       try {
         var temp = null
         Store.commit('updateLoading',true)
         if (this.editing) {
           temp = (await WebsitesService.put(this.pickItem))
-          if(temp)
-            Store.commit('updateMessage', 'Data Updated !!!')
+          Store.commit('updateMessage', 'Data Updated !!!')
         } else {
           temp = (await WebsitesService.post(this.pickItem))
-          if(temp)
-            Store.commit('updateMessage', 'Data Saved !!!')
+          Store.commit('updateMessage', 'Data Saved !!!')
         }
-        // console.log(temp)
         Store.commit('updateSuccessAlert',true)
         this.update()
       }catch(error){

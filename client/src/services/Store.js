@@ -10,6 +10,8 @@ const store = new Vuex.Store({
     loading: false,
     errorAlert: false,
     successAlert: false,
+    drawer: false,
+    cols: null
   },
   mutations: {
     updateWebsites (state, value) {
@@ -26,6 +28,12 @@ const store = new Vuex.Store({
     },
     updateSuccessAlert(state, successAlert) {
       state.successAlert = successAlert
+    },
+    setDrawer(state, payload){
+      state.drawer = payload
+    },
+    setCols(state, payload){
+      state.cols = payload
     }
   }
 })
