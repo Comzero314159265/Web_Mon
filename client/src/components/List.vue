@@ -1,5 +1,5 @@
 <template>
-  <v-layout row wrap mt-5>
+  <v-layout row wrap>
     <v-flex xs12>
       <v-data-table 
       :headers="headers"
@@ -146,15 +146,13 @@ export default {
       this.editing = true
     },
     async save(){
-      console.log(this.pickItem)
       try {
-        var temp = null
         Store.commit('updateLoading',true)
         if (this.editing) {
-          temp = (await WebsitesService.put(this.pickItem))
+          (await WebsitesService.put(this.pickItem))
           Store.commit('updateMessage', 'Data Updated !!!')
         } else {
-          temp = (await WebsitesService.post(this.pickItem))
+          (await WebsitesService.post(this.pickItem))
           Store.commit('updateMessage', 'Data Saved !!!')
         }
         Store.commit('updateSuccessAlert',true)

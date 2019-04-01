@@ -1,38 +1,51 @@
-// const async = require('async')
-// const axios = require('axios')
-// const { Website } = require('../models')
-
-// eslint-disable-next-line no-unused-vars
-const schedule = require('node-schedule')
-const scheduelname = 'fetchtest'
-var rule = new schedule.RecurrenceRule()
-rule.second = new schedule.Range(0, 59, 1)
-function fetch () {
-  console.log('work!!!')
-}
-
-exports.run = function () {
-  console.log('starting ...')
-  // console.log(rule)
-  schedule.scheduleJob(scheduelname, rule, fetch)
-}
-
-exports.cancel = function () {
-  console.log('cancel')
-  let sc = schedule.scheduledJobs[scheduelname]
-  sc.cancel()
-}
-
-exports.setTime = function (time) {
-  // cancel
-  this.cancel()
-  rule.second = null
-  rule.minute = new schedule.Range(0, 59, parseInt(time))
-  schedule.scheduleJob(scheduelname, rule, fetch)
-  // this.run()
-  // set new rule
-  // console.log('set time schedule to ' + time + ' minute' + scheduelname)
-  // rule.second = null
-  // rule.minute = new schedule.Range(0, 59, parseInt(time))
-  // run
+const agent = require('puppeteer')
+const path = require('path')
+const fs = require('fs')
+const { Website } = require('../models')
+exports.bot = async function (website) {
+  try {
+    let browser = await agent.launch()
+    let page = await browser.newPage()
+    await page.goto(website.url)
+    await page.setViewport({
+      width: 1920,
+      height: 1080
+    })
+    // update website
+    let now = Date.now()
+    let filename = website.name + '_' + now + '.png'
+    let filepath = path.join('img', filename)
+    let oldimg = website.screenshot
+    if (oldimg) {
+      fs.unlink(path.join('img', oldimg), (err) => console.log(err))
+    }
+    await page.screenshot({ path: filepath })
+    let update = {}
+    // titlt check
+    let title = await page.evaluate(
+      () => document.title
+    )
+    // content check
+    let content = await page.content()
+    // images check
+    let images = await page.evaluate(
+      () => Array.from(document.images).map(img => img.outerHTML)
+    )
+    let scripts = await page.evaluate(
+      () => Array.from(document.scripts).map(sc => sc.outerHTML)
+    )
+    if (title && content && images && scripts) {
+      console.log()
+    }
+    console.log(title)
+    await browser.close()
+    if (!website.stable) {
+      update.stable = content
+    }
+    update.current = content
+    update.screenshot = filename
+    await Website.update(update, { where: { id: website.id } })
+  } catch (error) {
+    console.log(error)
+  }
 }

@@ -2,11 +2,13 @@
   <v-app>
     <div id="app">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
-      <toolbar />
+        <transition name="fade">
+        <toolbar v-if="show" />
+        </transition>
       <v-layout
         wrap
         style="height: 100%;z-index:999;">
-        <v-container fluid mt-3>
+        <v-container fluid mt-0>
           <keep-alive>
             <router-view/>
           </keep-alive>
@@ -51,7 +53,6 @@
 
 <script>
   import 'vuetify/dist/vuetify.min.css'
-  import WebsitesService from '@/services/WebsitesService'
   import Toolbar from '@/components/Toolbar'
   import Drawer from "@/components/Drawer"
 
@@ -61,16 +62,14 @@
       Toolbar,
       Drawer
     },
+    created() {
+
+    },
     mounted() {
-      // this.fetch()
-      this.sockets.subscribe('websitesUpdate', function(data){
-        console.log('updating ...' + new Date().toLocaleString())
-        this.$store.commit('updateLoading', true)
-        this.$store.commit('updateWebsites', data)
-        this.$store.commit('updateLoading', false)
-      })
+      window.addEventListener('mousemove', this.mousemove);
     },
     computed: {
+
       loading(){
         return this.$store.state.loading
       },
@@ -95,12 +94,31 @@
       }
     },
     methods: {
-    }
+      mousemove: function (event) {
+        if (event.clientY < 50){
+          this.show = true
+        } else {
+          this.show = false
+        }
+      }
+    },
+    data() {
+      return {
+        show: false
+      }
+    },
   }
 </script>
 
 <style scope>
   .nounderline {
     text-decoration: none !important
+  }
+
+  .fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
   }
 </style>

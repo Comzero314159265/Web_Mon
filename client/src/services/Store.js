@@ -11,11 +11,12 @@ const store = new Vuex.Store({
     errorAlert: false,
     successAlert: false,
     drawer: false,
-    cols: null
+    cols: 3,
+    detail: null
   },
   mutations: {
-    updateWebsites (state, value) {
-      state.websites = value
+    updateWebsites (state, payload) {
+      state.websites = payload
     },
     updateMessage (state, msg) {
       state.message = msg
@@ -34,6 +35,9 @@ const store = new Vuex.Store({
     },
     setCols(state, payload){
       state.cols = payload
+    },
+    setDetail(state, payload){
+      state.detail = payload
     }
   }
 })

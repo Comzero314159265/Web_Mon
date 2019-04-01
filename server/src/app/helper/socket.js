@@ -1,43 +1,51 @@
 const { Website } = require('../models')
-const schedule = require('node-schedule')
+// const { Setting } = require('../models')
+// const schedule = require('node-schedule')
+const { bot } = require('./autobot')
+async function updateDate (io = null) {
+  try {
+    let websites = await Website.findAll({})
+    await Promise.all(websites.map(website => bot(website)))
+    websites = await Website.findAll({})
+    // console.log('data Updated!!!')
+    io.emit('websitesUpdate', websites)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function getWebsites (io = null) {
+  try {
+    let websites = await Website.findAll({})
+    io.emit('websitesUpdate', websites)
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 module.exports = (http) => {
-  // console.log('a user connect')
   const io = require('socket.io')(http)
-  let rule = new schedule.RecurrenceRule()
-  rule.minute = new schedule.Range(0, 59, 5)
-  let job = schedule.scheduleJob('screapping', rule, function () {
-    io.sockets.emit('updateWebsite', getWebsites(io.sockets))
-  })
+  const min = 1000 * 60
+  let refeshtime = min * 5
+  let interval = setInterval(() => {
+    updateDate(io)
+  }, refeshtime)
 
-  function getWebsites (socket) {
-    try {
-      // socket.emit('websitesUpdate', data)
-      (Website.findAll({})).then(
-        function (data) {
-          socket.emit('websitesUpdate', data)
-        }
-      )
-    } catch (error) {
-      // console.log(error)
-    }
-  }
-
-  io.on('connection', function (socket) {
-    console.log('a client connected!!')
-    // send init data
-    getWebsites(socket)
-
-    // set interval time
-    socket.on('clien_setinterval', function (data) {
-      console.log('Set time interval to ' + data + ' min')
-      job.cancel()
-      rule.second = null
-      rule.minute = data
-      job.reschedule(rule)
-      console.log('restart job with rule : min:' + rule.minute)
+  io.on('connection', async function (socket) {
+    console.log('Client connected!!!')
+    // first update when client connect
+    await getWebsites(socket)
+    await updateDate(socket)
+    socket.on('setIntervel', time => {
+      clearInterval(interval)
+      interval = setInterval(() => {
+        updateDate(io)
+      }, (min * time))
+      console.log('Change time to ' + time + ' min')
     })
-
-    //
+    // Logic
+    socket.on('disconnect', function () {
+      console.log('Client disconnected!!!')
+    })
   })
 }

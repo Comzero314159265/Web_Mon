@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar dark color="primary" style="position: fixed;z-index:2;">
+  <v-toolbar dark color="primary" style="position: relative;z-index:2;">
     <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
     <router-link :to="'/'" class="nounderline white--text">
       <v-toolbar-title>Web Mon</v-toolbar-title>
