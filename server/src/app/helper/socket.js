@@ -1,7 +1,8 @@
 const { Website } = require('../models')
-// const { Setting } = require('../models')
-// const schedule = require('node-schedule')
 const { bot } = require('./autobot')
+const systemconfig = require('../../config/systemconfig')
+const { Available } = require('../models')
+
 async function updateDate (io = null) {
   try {
     let websites = await Website.findAll({})
@@ -23,10 +24,19 @@ async function getWebsites (io = null) {
   }
 }
 
+async function getAvailable (id, io) {
+  try {
+    let availables = await Available.findAll({ where: { websiteID: id } })
+    io.emit('getAvailable', availables)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 module.exports = (http) => {
   const io = require('socket.io')(http)
   const min = 1000 * 60
-  let refeshtime = min * 5
+  let refeshtime = min * systemconfig.refesh_time
   let interval = setInterval(() => {
     updateDate(io)
   }, refeshtime)
@@ -35,15 +45,27 @@ module.exports = (http) => {
     console.log('Client connected!!!')
     // first update when client connect
     await getWebsites(socket)
-    await updateDate(socket)
+    // await updateDate(socket)
+    // Set interval time
     socket.on('setIntervel', time => {
       clearInterval(interval)
+      systemconfig.refeshtime = time
       interval = setInterval(() => {
         updateDate(io)
-      }, (min * time))
+      }, (min * systemconfig.refesh_time))
       console.log('Change time to ' + time + ' min')
     })
-    // Logic
+    // get setting
+    socket.emit('getSetting', systemconfig)
+    // get setting
+    socket.on('setSetting', config => {
+      console.log(config)
+    })
+    // get Available
+    socket.on('getAvailable', (id) => {
+      getAvailable(id, socket)
+      console.log('Available' + id)
+    })
     socket.on('disconnect', function () {
       console.log('Client disconnected!!!')
     })

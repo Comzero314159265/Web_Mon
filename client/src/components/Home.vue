@@ -3,7 +3,7 @@
     <v-layout row wrap>
       <v-flex xs12>
         <v-toolbar style="z-index:1;">
-          <h3> Your page on monitor <span class="red--text">{{ alertItem }}</span> / <span class="red--text">{{ items.length }}</span> page </h3>
+          <h3> Have anomaly  <span class="red--text">{{ alertItem }}</span> / <span class="red--text">{{ items.length }}</span> pages </h3>
           <v-spacer></v-spacer>
           <v-speed-dial
           v-model = "fab"
@@ -89,31 +89,13 @@
       </v-flex>
     </v-layout>
 
-      <!-- <v-btn
-        v-model="fab"
-        color="primary"
-        dark
-        fab
-        fixed
-        bottom
-        right
-        @click="dialog = true"
-      >
-      <v-icon>add</v-icon>
-      </v-btn> -->
   </div>
 </template>
 <script>
   export default {
     name: 'Home',
     mounted() {
-      this.$store.commit('updateLoading', true)
-      this.sockets.subscribe('websitesUpdate', function(data){
-        // console.log('updating ...' + new Date().toLocaleString())
-        this.items = data
-        this.$store.commit('updateLoading', false)
-        console.log('updated ...' + new Date().toLocaleString())
-      })
+      console.log(this.items)
     },
     data() {
       return {
@@ -122,17 +104,11 @@
     },
     computed: {
       alertItem () {
-        return this.items.filter(web => web.name == 'etda').length
-      },
-      filteredList () {
-        return this.websites.filter(item => {
-          return item.name.toLowerCase()
-          .includes(this.search.toLowerCase())
-        })
+        return this.items.filter(web => web.level > 0).length
       },
       items: {
         get: function() { return this.$store.state.websites },
-        set: function(val) { this.$store.commit('updateWebsites', val) }
+        set: function(val) { this.$store.commit('setWebsites', val) }
       },
       cols: {
           get: function() {
@@ -152,8 +128,14 @@
     },
     methods: {
       openDetail(web){
-        this.$store.commit('setDetail', web)
-        this.$router.push('Detail')
+        // this.$store.commit('setDetail', web)
+        if(web.stable && web.current){
+          this.$router.push({ name: 'Detail', params: { web }})
+        }else{
+          this.$store.commit('setMessage', 'Updating ...')
+          this.$store.commit('setErrorAlert', true)
+        }
+        
       },
       getCols(){
         return 'xs' + Math.floor(12 / this.cols)
@@ -168,14 +150,14 @@
           popup.moveTo(0, 0)
       },
       getClass(web){
-        if (web.name == 'etda') {
+        if (web.level > 0) {
           return 'red'
         } else {
           return 'green'
         }
       },
       getLevel(web){
-        if (web.name == 'etda') {
+        if (web.level > 0) {
           return true
         } else {
           return false
@@ -184,7 +166,7 @@
     },
   }
 </script>
-<style scope>
+<style>
   #create .v-speed-dial {
     position: absolute;
   }

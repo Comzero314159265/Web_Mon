@@ -12,22 +12,23 @@ const store = new Vuex.Store({
     successAlert: false,
     drawer: false,
     cols: 3,
-    detail: null
+    detail: null,
+    setting: {}
   },
   mutations: {
-    updateWebsites (state, payload) {
+    setWebsites (state, payload) {
       state.websites = payload
     },
-    updateMessage (state, msg) {
+    setMessage (state, msg) {
       state.message = msg
     },
-    updateLoading(state, loading) {
+    setLoading(state, loading) {
       state.loading = loading
     },
-    updateErrorAlert(state, errorAlert) {
+    setErrorAlert(state, errorAlert) {
       state.errorAlert = errorAlert
     },
-    updateSuccessAlert(state, successAlert) {
+    setSuccessAlert(state, successAlert) {
       state.successAlert = successAlert
     },
     setDrawer(state, payload){
@@ -38,6 +39,9 @@ const store = new Vuex.Store({
     },
     setDetail(state, payload){
       state.detail = payload
+    },
+    setSetting(state, payload){
+      state.setting = payload
     }
   }
 })

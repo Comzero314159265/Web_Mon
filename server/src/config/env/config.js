@@ -9,7 +9,8 @@ module.exports = {
     options: {
       dialect: process.env.DIALECT || 'sqlite',
       host: process.env.HOST || 'localhost',
-      storage: path.resolve(__dirname, '../../webmon.sqlite')
+      storage: path.resolve(__dirname, '../../webmon.sqlite'),
+      logging: false
     }
   }
 }

@@ -2,23 +2,22 @@ const agent = require('puppeteer')
 const path = require('path')
 const fs = require('fs')
 const { Website } = require('../models')
+const { Available } = require('../models')
+// const syetemconfig = require('../../config/systemconfig')
 exports.bot = async function (website) {
   try {
     let browser = await agent.launch()
     let page = await browser.newPage()
-    await page.goto(website.url)
     await page.setViewport({
       width: 1920,
       height: 1080
     })
+    await page.goto(website.url)
     // update website
     let now = Date.now()
     let filename = website.name + '_' + now + '.png'
     let filepath = path.join('img', filename)
     let oldimg = website.screenshot
-    if (oldimg) {
-      fs.unlink(path.join('img', oldimg), (err) => console.log(err))
-    }
     await page.screenshot({ path: filepath })
     let update = {}
     // titlt check
@@ -35,16 +34,25 @@ exports.bot = async function (website) {
       () => Array.from(document.scripts).map(sc => sc.outerHTML)
     )
     if (title && content && images && scripts) {
-      console.log()
+      // console.log()
     }
-    console.log(title)
+    const performance = JSON.parse(await page.evaluate(
+      () => JSON.stringify(window.performance.timing)
+    ))
+    let reponseTime = (performance.responseEnd - performance.responseStart)
+    await Available.create({ websiteID: website.id, responseTime: reponseTime })
     await browser.close()
+    // console.log(website.name + ':' + status)
     if (!website.stable) {
       update.stable = content
     }
+    update.prev = website.current
     update.current = content
     update.screenshot = filename
     await Website.update(update, { where: { id: website.id } })
+    if (oldimg) {
+      fs.unlink(path.join('img', oldimg), (err) => { console.log(err) })
+    }
   } catch (error) {
     console.log(error)
   }

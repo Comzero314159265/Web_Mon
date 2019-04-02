@@ -147,28 +147,28 @@ export default {
     },
     async save(){
       try {
-        Store.commit('updateLoading',true)
+        Store.commit('setLoading',true)
         if (this.editing) {
           (await WebsitesService.put(this.pickItem))
-          Store.commit('updateMessage', 'Data Updated !!!')
+          Store.commit('setMessage', 'Data Updated !!!')
         } else {
           (await WebsitesService.post(this.pickItem))
-          Store.commit('updateMessage', 'Data Saved !!!')
+          Store.commit('setMessage', 'Data Saved !!!')
         }
-        Store.commit('updateSuccessAlert',true)
+        Store.commit('setSuccessAlert',true)
         this.update()
       }catch(error){
-        Store.commit('updateMessage',error)
-        Store.commit('updateErrorAlert',true)
+        Store.commit('setMessage',error)
+        Store.commit('setErrorAlert',true)
       }finally{
-        Store.commit('updateLoading',false)
+        Store.commit('setLoading',false)
         this.editDialog = false
       }
     },
     async update () {
         try {
           this.loading = true
-          Store.commit('updateWebsites', (await WebsitesService.index()).data)
+          Store.commit('setWebsites', (await WebsitesService.index()).data)
         } catch (error) {
           this.meassage = error
           this.errorAlert = true

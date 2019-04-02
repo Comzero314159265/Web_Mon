@@ -3,7 +3,10 @@
     <div id="app">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
         <transition name="fade">
-        <toolbar v-if="show" />
+          <!-- <toolbar v-if="show" /> -->
+          <div v-if="show">
+            <toolbar  />
+          </div>
         </transition>
       <v-layout
         wrap
@@ -62,14 +65,28 @@
       Toolbar,
       Drawer
     },
-    created() {
-
-    },
     mounted() {
-      window.addEventListener('mousemove', this.mousemove);
+      window.addEventListener('mousemove', this.mousemove)
+      this.$store.commit('setLoading', true)
+      this.sockets.subscribe('websitesUpdate', function(data){
+        this.$store.commit('setWebsites', data)
+        this.$store.commit('setLoading', false)
+        console.log('updated ...' + new Date().toLocaleString())
+      })
+      this.sockets.subscribe('getSetting', data => {
+        this.$store.commit('setSetting', data)
+      })
+      setTimeout(() => { this.$store.commit('setLoading', false) }, 30000)
     },
     computed: {
-
+      websites: {
+        get: function () {
+          return this.$store.state.websites
+        },
+        set: function (val) {
+          this.$store.commit('setWebsites', val)
+        }
+      },
       loading(){
         return this.$store.state.loading
       },
@@ -110,14 +127,18 @@
   }
 </script>
 
-<style scope>
+<style>
   .nounderline {
     text-decoration: none !important
   }
 
-  .fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
+  .fade-leave-active {
+    transition: opacity 1s;
   }
+  .fade-enter-active {
+    transition: opacity 1s;
+  }
+
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
   }

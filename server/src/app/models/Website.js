@@ -4,8 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     url: { type: DataTypes.STRING, unique: true },
     stable: DataTypes.STRING,
     screenshot: DataTypes.STRING,
-    prev: DataTypes.STRING,
-    current: DataTypes.STRING
+    current: DataTypes.STRING,
+    level: { type: DataTypes.INTEGER, defaultValue: 0 }
   })
 
   Website.associate = (models) => {
