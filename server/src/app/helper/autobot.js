@@ -17,7 +17,9 @@ exports.bot = async function (website) {
     let now = Date.now()
     let filename = website.name + '_' + now + '.png'
     let filepath = path.join('img', filename)
-    let oldimg = website.screenshot
+    if (!fs.existsSync('img')) {
+      fs.mkdirSync('img')
+    }
     await page.screenshot({ path: filepath })
     let update = {}
     // titlt check
@@ -50,9 +52,10 @@ exports.bot = async function (website) {
     update.current = content
     update.screenshot = filename
     await Website.update(update, { where: { id: website.id } })
-    if (oldimg) {
-      fs.unlink(path.join('img', oldimg), (err) => { console.log(err) })
+    if (website.screenshot != null) {
+      fs.unlink(path.join('img', website.screenshot), (err) => { console.log(err) })
     }
+    console.log('autobot updated')
   } catch (error) {
     console.log(error)
   }

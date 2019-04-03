@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     settiming(){
-      console.log(this.setting)
+      // console.log(this.setting)
     }
   },
 }

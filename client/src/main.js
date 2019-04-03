@@ -4,7 +4,7 @@ import axios from 'axios'
 import router from './router'
 import Vuetify from 'vuetify'
 import VueSocketIO from 'vue-socket.io'
-import SocketIO from 'socket.io-client';
+import SocketIO from 'socket.io-client'
 import store from './services/Store'
 
 Vue.prototype.$http = axios

@@ -46,25 +46,41 @@
             <span class="headline">Edit Website</span>
           </v-card-title>
           <v-card-text>
+            <form>
             <v-container grid-list-md>
               <v-layout row wrap>
                 <v-flex md12>
-                  <v-text-field label="Name*" required v-model="pickItem.name"></v-text-field>
+                  <v-text-field 
+                  label="Name*"
+                  :error-messages="nameErrors"
+                  required 
+                  v-model="name"
+                  @input="$v.name.$touch()"
+                  @blur="$v.name.$touch()">
+                  </v-text-field>
                 </v-flex>
               </v-layout>
               <v-layout row wrap>
                 <v-flex md12>
-                  <v-text-field label="Url*" required v-model="pickItem.url"></v-text-field>
+                  <v-text-field 
+                  label="Url*"
+                  :error-messages="urlErrors"
+                  required 
+                  v-model="url"
+                  @input="$v.url.$touch()"
+                  @blur="$v.url.$touch()">
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
+            </form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="editDialog = false;">
-              Close
+            <v-btn @click="clear">
+              Clear
             </v-btn>
-            <v-btn @click="save()">
+            <v-btn @click="submit">
               {{ editing ? 'Update' : 'Add Website' }}
             </v-btn>
           </v-card-actions>
@@ -96,10 +112,21 @@
 <script>
 import WebsitesService from '@/services/WebsitesService'
 import Store from '@/services/Store'
+import {
+  validationMixin
+} from 'vuelidate'
+import {
+  required,
+  url
+} from 'vuelidate/lib/validators'
 
 export default {
+  mixins: [validationMixin],
+  validations: {
+    name: { required },
+    url: { required, url }
+  },
   mounted() {
-
   },
   data() {
     return {
@@ -116,6 +143,9 @@ export default {
         name: null,
         url: null
       },
+      name: null,
+      url: null,
+      id: null,
       editing: false,
       currentWeb: null
     }
@@ -124,35 +154,53 @@ export default {
     async deleteWeb() {
       try{
         (await WebsitesService.delete(this.currentWeb))
-        Store.commit('updateMessage', 'Data Deleted !!!')
-        Store.commit('updateSucessAlert',true)
+        Store.commit('setMessage', 'Data Deleted !!!')
+        Store.commit('setSuccessAlert',true)
         this.update()
       }catch(error){
-        Store.commit('updateMessage',error)
-        Store.commit('updateErrorAlert',true)
+        Store.commit('setMessage',error)
+        Store.commit('setErrorAlert',true)
       }finally{
         this.confirmDialog = false
       }
     },
+    submit(){
+      this.$v.$touch()
+      if (!this.$v.$invalid) {
+        this.save()
+      }
+    },
     clear(){
-      this.pickItem.id = null
-      this.pickItem.name = null
-      this.pickItem.url = null
+      this.$v.$reset()
+      this.id = null
+      this.name = null
+      this.url = null
       this.editing = false
     },
     edit(website){
       this.clear()
+      this.name = website.name
+      this.url = website.url
+      this.id = website.id
       this.pickItem = Object.assign({}, { id:website.id , name:website.name, url:website.url })
       this.editing = true
     },
     async save(){
       try {
         Store.commit('setLoading',true)
+        let item = {
+          name: this.name,
+          url: this.url
+        }
+        if(this.id){
+          item.id = this.id
+        }
+
         if (this.editing) {
-          (await WebsitesService.put(this.pickItem))
+          (await WebsitesService.put(item))
           Store.commit('setMessage', 'Data Updated !!!')
         } else {
-          (await WebsitesService.post(this.pickItem))
+          (await WebsitesService.post(item))
           Store.commit('setMessage', 'Data Saved !!!')
         }
         Store.commit('setSuccessAlert',true)
@@ -169,6 +217,7 @@ export default {
         try {
           this.loading = true
           Store.commit('setWebsites', (await WebsitesService.index()).data)
+          this.$socket.emit('addWebsite')
         } catch (error) {
           this.meassage = error
           this.errorAlert = true
@@ -180,6 +229,19 @@ export default {
   computed: {
     websites() {
       return Store.state.websites
+    },
+    nameErrors () {
+      const errors = []
+      if (!this.$v.name.$dirty) return errors
+      !this.$v.name.required && errors.push('Name is required.')
+      return errors
+    },
+    urlErrors () {
+      const errors = []
+      if (!this.$v.url.$dirty) return errors
+      !this.$v.url.required && errors.push('Url is required.')
+      !this.$v.url.url && errors.push('Invalid url format')
+      return errors
     }
   },
 }

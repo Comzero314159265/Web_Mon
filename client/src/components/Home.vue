@@ -95,7 +95,7 @@
   export default {
     name: 'Home',
     mounted() {
-      console.log(this.items)
+      // console.log(this.items)
     },
     data() {
       return {

@@ -41,9 +41,16 @@ exports.index = (req, res) => {
       console.log(error)
     })
 }
-
+const path = require('path')
 exports.screenshot = (req, res) => {
-  const path = require('path')
-  const url = req.params.path
-  res.sendFile(path.join('img', url), { root: path.resolve(__dirname, '../../../') })
+  try {
+    const url = req.params.path
+    if (url === 'null') {
+      res.sendFile(path.join('img', 'image-not-found.png'), { root: path.resolve(__dirname, '../../../') })
+    } else {
+      res.sendFile(path.join('img', url), { root: path.resolve(__dirname, '../../../') })
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }

@@ -3,12 +3,12 @@ const { bot } = require('./autobot')
 const systemconfig = require('../../config/systemconfig')
 const { Available } = require('../models')
 
-async function updateDate (io = null) {
+async function updateWebsite (io) {
   try {
     let websites = await Website.findAll({})
     await Promise.all(websites.map(website => bot(website)))
     websites = await Website.findAll({})
-    // console.log('data Updated!!!')
+    console.log('data Updated!!!')
     io.emit('websitesUpdate', websites)
   } catch (error) {
     console.log(error)
@@ -38,20 +38,20 @@ module.exports = (http) => {
   const min = 1000 * 60
   let refeshtime = min * systemconfig.refesh_time
   let interval = setInterval(() => {
-    updateDate(io)
+    updateWebsite(io)
   }, refeshtime)
 
   io.on('connection', async function (socket) {
     console.log('Client connected!!!')
     // first update when client connect
-    await getWebsites(socket)
-    // await updateDate(socket)
+    getWebsites(socket)
+    // await updateWebsite(socket)
     // Set interval time
     socket.on('setIntervel', time => {
       clearInterval(interval)
       systemconfig.refeshtime = time
       interval = setInterval(() => {
-        updateDate(io)
+        updateWebsite(io)
       }, (min * systemconfig.refesh_time))
       console.log('Change time to ' + time + ' min')
     })
@@ -60,6 +60,10 @@ module.exports = (http) => {
     // get setting
     socket.on('setSetting', config => {
       console.log(config)
+    })
+    // add website
+    socket.on('addWebsite', () => {
+      updateWebsite(io)
     })
     // get Available
     socket.on('getAvailable', (id) => {

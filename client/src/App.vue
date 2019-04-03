@@ -71,12 +71,12 @@
       this.sockets.subscribe('websitesUpdate', function(data){
         this.$store.commit('setWebsites', data)
         this.$store.commit('setLoading', false)
-        console.log('updated ...' + new Date().toLocaleString())
+        // console.log('updated ...' + new Date().toLocaleString())
       })
       this.sockets.subscribe('getSetting', data => {
         this.$store.commit('setSetting', data)
       })
-      setTimeout(() => { this.$store.commit('setLoading', false) }, 30000)
+      setTimeout(() => { this.$store.commit('setLoading', false) }, 10000)
     },
     computed: {
       websites: {

@@ -1,6 +1,15 @@
 <template>
   <div>
     <v-layout row wrap  justify-center>
+      <v-flex xs10>
+        <v-card>
+          <v-card-text>
+            <canvas ref="chartAvailable"></canvas>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap  justify-center>
       <v-flex xs10 px-1>
         <h3 class="text-md-center headline">Change contents: {{ website.name }}</h3>
         <v-card>
@@ -18,51 +27,117 @@
 </template>
 <script>
 let Diff = require('diff')
+import AvailableService from '@/services/AvailableService'
+import chart from 'chart.js'
+import moment from 'moment'
 export default {
   mounted() {
     this.website = this.$route.params.web
     this.getDiff()
-    // console.log(this.$refs)
-    this.sockets.subscribe('getAvailable', data => {
-      this.data = data
-    })
+    this.plot()
   },
   watch: {
     $route (to){
       if(to && to.name == 'Detail'){
         this.getDiff()
+        this.plot()
       }
       
     }
   },
   methods: {
-    getDiff() {
+    async plot() {
+      let availables = (await AvailableService.show(this.website.id)).data
+      let data = []
+      for (const key in availables) {
+        if (availables.hasOwnProperty(key)) {
+          const item = availables[key]
+          let date = moment(item.updatedAt).valueOf()
+          let value = item.responseTime
+          data.push({ t: date, y: value })
+          
+        }
+      }
+      let ctx = this.$refs.chartAvailable.getContext('2d')
+      let cfg = {
+        type: 'bar',
+        data: {
+          datasets: [{
+            label: 'response time(' + this.website.name + ')',
+            backgroundColor: 'rgba(255, 99, 132, .5)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: data,
+            type: 'line',
+            pointRadius: 0,
+            fill: false,
+            lineTension: 0,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          scales: {
+            xAxes: [{
+              type: 'time',
+              distribution: 'series',
+              ticks: {
+                source: 'data',
+                autoSkip: true
+              }
+            }],
+            yAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Response time (ms)'
+              }
+            }]
+          }
+        },
+        tooltips: {
+          intersect: false,
+          mode: 'index',
+          callbacks: {
+            label: function(tooltipItem, myData){
+              let label = myData.datasets[tooltipItem.datasetIndex].label || ''
+              if(label){
+                label += ': '
+              }
+              label += parseFloat(tooltipItem.value).toFixed(2)
+              return label
+            }
+          }
+        }
+      }
+      new chart(ctx, cfg)
+    },
+    async getDiff() {
       this.website = this.$route.params.web
-      this.$socket.emit('getAvailable', this.website.id)
       this.$refs.showDiff.innerHTML = ''
       let display = this.$refs.showDiff
-      let fragment = document.createDocumentFragment()
-      let diff = Diff.diffWords(this.website.stable, this.website.current)
-      for (var i=0; i < diff.length; i++) {
-        if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
-          let swap = diff[i];
-          diff[i] = diff[i + 1];
-          diff[i + 1] = swap;
-        }
+      if(this.website.stable != null && this.website.current != null){
+        let fragment = document.createDocumentFragment()
+        let diff = Diff.diffLines(this.website.stable, this.website.current)
+        for (var i=0; i < diff.length; i++) {
+          if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
+            let swap = diff[i];
+            diff[i] = diff[i + 1];
+            diff[i + 1] = swap;
+          }
 
-        let node;
-        if (diff[i].removed) {
-          node = document.createElement('del');
-          node.appendChild(document.createTextNode(diff[i].value));
-        } else if (diff[i].added) {
-          node = document.createElement('ins');
-          node.appendChild(document.createTextNode(diff[i].value));
-        } else {
-          node = document.createTextNode(diff[i].value);
+          let node;
+          if (diff[i].removed) {
+            node = document.createElement('del');
+            node.appendChild(document.createTextNode(diff[i].value));
+          } else if (diff[i].added) {
+            node = document.createElement('ins');
+            node.appendChild(document.createTextNode(diff[i].value));
+          } else {
+            node = document.createTextNode(diff[i].value);
+          }
+          fragment.appendChild(node);
         }
-        fragment.appendChild(node);
+        display.appendChild(fragment)
       }
-      display.appendChild(fragment)
+
     }
   },
   data() {
@@ -75,7 +150,8 @@ export default {
       test: '',
       display: null,
       fragment: null,
-      data: null
+      data: null,
+      availables: null
     }
   }
 }
