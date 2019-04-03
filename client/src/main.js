@@ -6,12 +6,13 @@ import Vuetify from 'vuetify'
 import VueSocketIO from 'vue-socket.io'
 import SocketIO from 'socket.io-client'
 import store from './services/Store'
-
+import Vuetour from 'vue-tour'
 Vue.prototype.$http = axios
 Vue.prototype.$store = store
 
 Vue.config.productionTip = false
 Vue.use(Vuetify)
+Vue.use(Vuetour)
 
 Vue.use(new VueSocketIO({
   debug: false,

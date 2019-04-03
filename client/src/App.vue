@@ -71,6 +71,7 @@
       this.sockets.subscribe('websitesUpdate', function(data){
         this.$store.commit('setWebsites', data)
         this.$store.commit('setLoading', false)
+        console.log(data)
         // console.log('updated ...' + new Date().toLocaleString())
       })
       this.sockets.subscribe('getSetting', data => {
@@ -141,5 +142,9 @@
 
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
+  }
+
+  .text--white {
+    color: white!important;
   }
 </style>

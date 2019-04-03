@@ -11,6 +11,7 @@
           :top = true
           :direction = "'bottom'"
           :transition = "'slide-y-reverse-transition'"
+          data-v-step="1"
           >
           <template v-slot:activator>
           <v-btn
@@ -28,7 +29,7 @@
           @click="cols = 1">
           1
           </v-btn>
-                    <v-btn
+          <v-btn
           fab
           dark
           color="white"
@@ -66,7 +67,7 @@
           <!-- screenshot -->
           <div @click="openDetail(item)">
           <v-img :src="'http://localhost:3000/screenshot/'+(item.screenshot)" 
-            v-bind:class="[item.name == 'etda' ? 'alert' : 'normal']">
+            v-bind:class="[item.level > 1 ? 'alert' : '']">
             <v-layout
               right
               fill-height
@@ -88,14 +89,12 @@
         </v-hover>
       </v-flex>
     </v-layout>
-
   </div>
 </template>
 <script>
   export default {
     name: 'Home',
     mounted() {
-      // console.log(this.items)
     },
     data() {
       return {
@@ -140,18 +139,13 @@
       getCols(){
         return 'xs' + Math.floor(12 / this.cols)
       },
-      viewWeb (url) {
-        var params = [
-          'height=' + screen.availHeight,
-          'width=' + screen.availWidth,
-          'fullscreen=yes'
-          ].join(',')
-          var popup = window.open(url, 'popup_window', params)
-          popup.moveTo(0, 0)
-      },
       getClass(web){
-        if (web.level > 0) {
+        if (web.level == 3) {
           return 'red'
+        } else if (web.level == 2) {
+          return 'orange'
+        } else if (web.level == 1) {
+          return 'yellow'
         } else {
           return 'green'
         }

@@ -19,7 +19,7 @@
           <v-divider></v-divider>
 
           <router-link v-for="item in items"
-            :key="item.title" :to="item.links" class="nounderline text-dark">
+            :key="item.title" :to="item.links" class="nounderline black--text" v-bind:class="[item.disabled ? 'disabled' : '']">
           <v-list-tile>
             <v-list-tile-action>
               <v-icon>{{ item.icon }}</v-icon>
@@ -41,8 +41,8 @@ export default {
     return {
       items: [
           { title: 'Defacement Mon', icon: 'web' , links: '/'},
-          { title: 'Available Mon', icon: 'event_available', links: ''},
-          { title: 'Setting', icon: 'settings', links: 'Setting'},
+          { title: 'Available Mon', icon: 'event_available', links: '/Available', disabled: true},
+          { title: 'Setting', icon: 'settings', links: '/Setting'},
         ]  
     }
   },
@@ -54,3 +54,14 @@ export default {
   },
 }
 </script>
+<style scope>
+  .router-link-active {
+    color: black!important;
+  }
+  .router-link-exact-active {
+    color: #1976d2!important;
+  }
+  .disabled {
+    color: gray!important;
+  }
+</style>

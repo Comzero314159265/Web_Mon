@@ -26,11 +26,27 @@ async function getWebsites (io = null) {
 
 async function getAvailable (id, io) {
   try {
-    let availables = await Available.findAll({ where: { websiteID: id } })
+    let availables = await Available.findAll({ where: { websiteID: id }, limit: 500 })
     io.emit('getAvailable', availables)
   } catch (error) {
     console.log(error)
   }
+}
+
+async function setStable (id, io) {
+  try {
+    let website = await Website.findByPk(id)
+    await Website.update({ stable: website.current, level: 0 }, { where: { id: id } })
+    getWebsites(io)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function test () {
+  const stringSimilarity = require('string-similarity')
+  let website = await Website.findByPk(1)
+  console.log(stringSimilarity.compareTwoStrings(website.stable, website.current))
 }
 
 module.exports = (http) => {
@@ -45,6 +61,7 @@ module.exports = (http) => {
     console.log('Client connected!!!')
     // first update when client connect
     getWebsites(socket)
+    test()
     // await updateWebsite(socket)
     // Set interval time
     socket.on('setIntervel', time => {
@@ -69,6 +86,11 @@ module.exports = (http) => {
     socket.on('getAvailable', (id) => {
       getAvailable(id, socket)
       console.log('Available' + id)
+    })
+    // set Stable
+    socket.on('setStable', id => {
+      setStable(id, io)
+      socket.emit('setStable')
     })
     socket.on('disconnect', function () {
       console.log('Client disconnected!!!')

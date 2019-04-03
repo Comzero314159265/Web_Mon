@@ -4,6 +4,7 @@ const fs = require('fs')
 const { Website } = require('../models')
 const { Available } = require('../models')
 // const syetemconfig = require('../../config/systemconfig')
+const stringSimilarity = require('string-similarity')
 exports.bot = async function (website) {
   try {
     let browser = await agent.launch()
@@ -45,8 +46,20 @@ exports.bot = async function (website) {
     await Available.create({ websiteID: website.id, responseTime: reponseTime })
     await browser.close()
     // console.log(website.name + ':' + status)
-    if (!website.stable) {
+    if (website.stable == null) {
       update.stable = content
+    } else {
+      let ratio = stringSimilarity.compareTwoStrings(website.stable, content)
+      if (ratio < 0.8) {
+        update.level = 1
+      } else if (ratio < 0.6) {
+        update.level = 2
+      } else if (ratio < 0.5) {
+        update.level = 3
+      }
+      console.log('name: ' + website.name)
+      console.log('ratio: ' + ratio)
+      console.log('level: ' + update.level)
     }
     update.prev = website.current
     update.current = content

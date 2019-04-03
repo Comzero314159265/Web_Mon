@@ -1,18 +1,27 @@
 <template>
   <div>
-    <v-layout row wrap  justify-center>
+    <v-layout row wrap  justify-center mb-1>
       <v-flex xs10>
         <v-card>
+          <v-card-title>
+            <v-layout justify-center>
+              <h3 class="text-md-center headline">Website available: {{ website.name }}</h3>
+            </v-layout>
+          </v-card-title>
           <v-card-text>
             <canvas ref="chartAvailable"></canvas>
           </v-card-text>
         </v-card>
       </v-flex>
     </v-layout>
-    <v-layout row wrap  justify-center>
-      <v-flex xs10 px-1>
-        <h3 class="text-md-center headline">Change contents: {{ website.name }}</h3>
+    <v-layout row wrap  justify-center my-2>
+      <v-flex xs10>
         <v-card>
+          <v-card-title>
+            <v-layout justify-center>
+              <h3 class="text-md-center headline">Change contents: {{ website.name }}</h3>
+            </v-layout>
+          </v-card-title>
           <v-card-text>
             <v-layout row wrap justify-center>
               <v-flex xs12 px-2 py-2>
@@ -23,6 +32,42 @@
         </v-card>
       </v-flex>
     </v-layout>
+    <v-speed-dial
+      v-model="fab"
+      fixed
+      bottom
+      right
+      :direction="'top'"
+      :open-on-hover="hover"
+      >
+      <template v-slot:activator>
+        <v-btn
+            v-model="fab"
+            color="blue darken-2"
+            dark
+            fab
+          >
+          <v-icon>more_horiz</v-icon>
+        </v-btn>
+      </template>
+      <v-btn
+        dark
+        fab
+        color="blue lighten-2"
+        @click="openWeb()"
+      >
+      <v-icon>remove_red_eye</v-icon>
+      </v-btn>
+      <v-btn
+        color="blue lighten-2"
+        dark
+        fab
+        @click="setStable()"
+      >
+      <v-icon>update</v-icon>
+      </v-btn>
+    </v-speed-dial>
+
   </div>
 </template>
 <script>
@@ -35,6 +80,12 @@ export default {
     this.website = this.$route.params.web
     this.getDiff()
     this.plot()
+    this.sockets.subscribe('setStable', () => {
+      this.$store.commit('setMessage', 'Verson up to date!!!')
+      this.$store.commit('setSuccessAlert', true)
+      this.plot()
+      this.getDiff()
+    })
   },
   watch: {
     $route (to){
@@ -47,6 +98,10 @@ export default {
   },
   methods: {
     async plot() {
+      if(!this.website){
+        this.$router.replace('/')
+        return
+      }
       let availables = (await AvailableService.show(this.website.id)).data
       let data = []
       for (const key in availables) {
@@ -63,7 +118,7 @@ export default {
         type: 'bar',
         data: {
           datasets: [{
-            label: 'response time(' + this.website.name + ')',
+            label: 'Response time(' + this.website.name + ')',
             backgroundColor: 'rgba(255, 99, 132, .5)',
             borderColor: 'rgb(255, 99, 132)',
             data: data,
@@ -111,6 +166,10 @@ export default {
     },
     async getDiff() {
       this.website = this.$route.params.web
+      if(!this.website){
+        this.$router.replace('/')
+        return
+      }
       this.$refs.showDiff.innerHTML = ''
       let display = this.$refs.showDiff
       if(this.website.stable != null && this.website.current != null){
@@ -137,7 +196,23 @@ export default {
         }
         display.appendChild(fragment)
       }
-
+    },
+    openWeb() {
+      if(this.website) {
+        let url = this.website.url
+        var params = [
+          'height=' + screen.availHeight,
+          'width=' + screen.availWidth,
+          'fullscreen=yes'
+        ].join(',')
+        var popup = window.open(url, 'popup_window', params)
+        popup.moveTo(0, 0)
+      }
+    },
+    setStable() {
+      if(this.website) {
+        this.$socket.emit('setStable', this.website.id)
+      }
     }
   },
   data() {
@@ -151,13 +226,15 @@ export default {
       display: null,
       fragment: null,
       data: null,
-      availables: null
+      availables: null,
+      fab: false,
+      hover: false
     }
   }
 }
 </script>
 
-<style>
+<style scope>
   del {
     text-decoration: none;
     color: #b30000;
@@ -172,5 +249,13 @@ export default {
   }
   .diffPanel{
     word-wrap: break-word;
+  }
+
+  #create .v-speed-dial {
+    position: absolute;
+  }
+
+  #create .v-btn--floating {
+    position: relative;
   }
 </style>
