@@ -1,7 +1,6 @@
 <template>
   <v-app>
     <div id="app">
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
         <transition name="fade">
           <!-- <toolbar v-if="show" /> -->
           <div v-if="show">
@@ -55,6 +54,7 @@
 </template>
 
 <script>
+  import "material-design-icons/iconfont/material-icons.css"
   import 'vuetify/dist/vuetify.min.css'
   import Toolbar from '@/components/Toolbar'
   import Drawer from "@/components/Drawer"
@@ -69,10 +69,9 @@
       window.addEventListener('mousemove', this.mousemove)
       this.$store.commit('setLoading', true)
       this.sockets.subscribe('websitesUpdate', function(data){
+        // console.log('updated!!' + new Date().toLocaleString())
         this.$store.commit('setWebsites', data)
         this.$store.commit('setLoading', false)
-        console.log(data)
-        // console.log('updated ...' + new Date().toLocaleString())
       })
       this.sockets.subscribe('getSetting', data => {
         this.$store.commit('setSetting', data)

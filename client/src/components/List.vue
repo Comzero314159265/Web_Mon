@@ -1,6 +1,15 @@
 <template>
-  <v-layout row wrap>
-    <v-flex xs12>
+  <v-layout row wrap justify-center>
+    <v-flex xs10 text-md-center>
+      <v-card>
+        <v-card-title primary-title>
+          <v-layout row wrap justify-center>
+            <h2>List of Site</h2>
+          </v-layout>
+        </v-card-title>
+      </v-card>
+    </v-flex>
+    <v-flex xs10>
       <v-data-table 
       :headers="headers"
       :items="websites"
@@ -200,7 +209,8 @@ export default {
           (await WebsitesService.put(item))
           Store.commit('setMessage', 'Data Updated !!!')
         } else {
-          (await WebsitesService.post(item))
+          let website = (await WebsitesService.post(item)).data
+          this.$socket.emit('updateSingleWebsite', website)
           Store.commit('setMessage', 'Data Saved !!!')
         }
         Store.commit('setSuccessAlert',true)

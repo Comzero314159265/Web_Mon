@@ -3,7 +3,7 @@
     <v-layout row wrap>
       <v-flex xs12>
         <v-toolbar style="z-index:1;">
-          <h3> Have anomaly  <span class="red--text">{{ alertItem }}</span> / <span class="red--text">{{ items.length }}</span> pages </h3>
+          <h3> Anomaly  <span class="red--text">{{ alertItem }}</span> / <span class="red--text">{{ items.length }}</span> Sites </h3>
           <v-spacer></v-spacer>
           <v-speed-dial
           v-model = "fab"
@@ -11,13 +11,16 @@
           :top = true
           :direction = "'bottom'"
           :transition = "'slide-y-reverse-transition'"
+          floating
           data-v-step="1"
           >
           <template v-slot:activator>
           <v-btn
+              v-model = "fab"
               color="primary"
               dark
               fab>
+            <v-icon>view_module</v-icon>
             <v-icon>view_module</v-icon>
             </v-btn>
           </template>
@@ -60,7 +63,7 @@
     <v-layout row wrap mt-1>
       <!-- Website items -->
       <v-flex v-for="item in items"
-        v-bind:key="item.screenshot"
+        v-bind:key="item.id"
         v-bind:class="getCols()" px-1 py-1>
         <v-hover>
         <v-card class="link" slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`">
@@ -78,7 +81,7 @@
           </v-img>
           </div>
           <v-card-actions >
-            <h4>{{ item.name }}</h4>
+            <h3>{{ item.name.toUpperCase() }}</h3>
             <!-- <v-spacer></v-spacer  >
             <v-btn @click="viewWeb(item.url)" relative>
               <v-icon >fullscreen</v-icon>
@@ -95,6 +98,7 @@
   export default {
     name: 'Home',
     mounted() {
+      this.cols = localStorage.getItem('cols')
     },
     data() {
       return {
@@ -111,10 +115,11 @@
       },
       cols: {
           get: function() {
-            return this.$store.state.cols 
+            return this.$store.state.cols
           },
           set: function(val) {
             this.$store.commit('setCols', val)
+            localStorage.setItem('cols', val)
           }
         }
     },
@@ -129,7 +134,7 @@
       openDetail(web){
         // this.$store.commit('setDetail', web)
         if(web.stable && web.current){
-          this.$router.push({ name: 'Detail', params: { web }})
+          this.$router.push({ name: 'Detail', query: { web_id: web.id }})
         }else{
           this.$store.commit('setMessage', 'Updating ...')
           this.$store.commit('setErrorAlert', true)
@@ -141,13 +146,13 @@
       },
       getClass(web){
         if (web.level == 3) {
-          return 'red'
+          return '#d50000'
         } else if (web.level == 2) {
-          return 'orange'
+          return '#fb8c00'
         } else if (web.level == 1) {
-          return 'yellow'
+          return '#ffd54f'
         } else {
-          return 'green'
+          return '#66bb6a'
         }
       },
       getLevel(web){
@@ -160,13 +165,13 @@
     },
   }
 </script>
-<style>
+<style scope>
   #create .v-speed-dial {
-    position: absolute;
+    position: absolute!important;
   }
 
   #create .v-btn--floating {
-    position: relative;
+    position: relative!important;
   }
 
   .alert {

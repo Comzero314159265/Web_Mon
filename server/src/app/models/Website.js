@@ -1,6 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Website = sequelize.define('Website', {
     name: DataTypes.STRING,
+    title: DataTypes.STRING,
     url: { type: DataTypes.STRING, unique: true },
     stable: DataTypes.STRING,
     screenshot: DataTypes.STRING,

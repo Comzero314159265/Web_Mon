@@ -13,7 +13,14 @@ const store = new Vuex.Store({
     drawer: false,
     cols: 3,
     detail: null,
-    setting: {}
+    setting: {
+      contentCheck: null,
+      imagesCheck: null,
+      linkCheck: null,
+      refeshTime: null,
+      scriptsCheck: null,
+      titleCheck: null,
+    }
   },
   mutations: {
     setWebsites (state, payload) {

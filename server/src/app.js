@@ -4,7 +4,6 @@ const express = require('./config/express')
 const config = require('./config/env/config')
 const app = express()
 const http = require('http').Server(app)
-require('./app/helper/socket')(http)
 
 const {
   sequelize
@@ -12,6 +11,7 @@ const {
 
 sequelize.sync()
   .then(() => {
+    require('./app/helper/socket')(http)
     http.listen(config.port, () => console.log('Server running at http://localhost:' + config.port))
   })
 

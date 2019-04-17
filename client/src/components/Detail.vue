@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout row wrap  justify-center mb-1>
+    <!-- <v-layout row wrap  justify-center mb-1>
       <v-flex xs10>
         <v-card>
           <v-card-title>
@@ -13,13 +13,13 @@
           </v-card-text>
         </v-card>
       </v-flex>
-    </v-layout>
+    </v-layout> -->
     <v-layout row wrap  justify-center my-2>
       <v-flex xs10>
         <v-card>
           <v-card-title>
             <v-layout justify-center>
-              <h3 class="text-md-center headline">Change contents: {{ website.name }}</h3>
+              <h1 class="text-md-center">Site: <span class="primary--text">{{ website.name.toUpperCase() }}</span></h1>
             </v-layout>
           </v-card-title>
           <v-card-text>
@@ -72,104 +72,109 @@
 </template>
 <script>
 let Diff = require('diff')
-import AvailableService from '@/services/AvailableService'
-import chart from 'chart.js'
-import moment from 'moment'
+// import AvailableService from '@/services/AvailableService'
+// import chart from 'chart.js'
+// import moment from 'moment'
 export default {
   mounted() {
-    this.website = this.$route.params.web
-    this.getDiff()
-    this.plot()
+    // this.plot()
+    this.$socket.emit('getSingleweb', this.$route.query.web_id)
     this.sockets.subscribe('setStable', () => {
       this.$store.commit('setMessage', 'Verson up to date!!!')
       this.$store.commit('setSuccessAlert', true)
-      this.plot()
+      // this.plot()
+      this.getDiff()
+    })
+
+    this.sockets.subscribe('getSingleweb', (website) => {
+      this.website = website
       this.getDiff()
     })
   },
   watch: {
     $route (to){
       if(to && to.name == 'Detail'){
-        this.getDiff()
-        this.plot()
+        // this.getDiff()
+        this.$socket.emit('getSingleweb', this.$route.query.web_id)
+        // this.plot()
       }
       
     }
   },
   methods: {
-    async plot() {
-      if(!this.website){
-        this.$router.replace('/')
-        return
-      }
-      let availables = (await AvailableService.show(this.website.id)).data
-      let data = []
-      for (const key in availables) {
-        if (availables.hasOwnProperty(key)) {
-          const item = availables[key]
-          let date = moment(item.updatedAt).valueOf()
-          let value = item.responseTime
-          data.push({ t: date, y: value })
+    // async plot() {
+    //   if(!this.website){
+    //     this.$router.replace('/')
+    //     return
+    //   }
+    //   let availables = (await AvailableService.show(this.website.id)).data
+    //   let data = []
+    //   for (const key in availables) {
+    //     if (availables.hasOwnProperty(key)) {
+    //       const item = availables[key]
+    //       let date = moment(item.updatedAt).valueOf()
+    //       let value = item.responseTime
+    //       data.push({ t: date, y: value })
           
-        }
-      }
-      let ctx = this.$refs.chartAvailable.getContext('2d')
-      let cfg = {
-        type: 'bar',
-        data: {
-          datasets: [{
-            label: 'Response time(' + this.website.name + ')',
-            backgroundColor: 'rgba(255, 99, 132, .5)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: data,
-            type: 'line',
-            pointRadius: 0,
-            fill: false,
-            lineTension: 0,
-            borderWidth: 2
-          }]
-        },
-        options: {
-          scales: {
-            xAxes: [{
-              type: 'time',
-              distribution: 'series',
-              ticks: {
-                source: 'data',
-                autoSkip: true
-              }
-            }],
-            yAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Response time (ms)'
-              }
-            }]
-          }
-        },
-        tooltips: {
-          intersect: false,
-          mode: 'index',
-          callbacks: {
-            label: function(tooltipItem, myData){
-              let label = myData.datasets[tooltipItem.datasetIndex].label || ''
-              if(label){
-                label += ': '
-              }
-              label += parseFloat(tooltipItem.value).toFixed(2)
-              return label
-            }
-          }
-        }
-      }
-      new chart(ctx, cfg)
-    },
+    //     }
+    //   }
+    //   let ctx = this.$refs.chartAvailable.getContext('2d')
+    //   let cfg = {
+    //     type: 'bar',
+    //     data: {
+    //       datasets: [{
+    //         label: 'Response time(' + this.website.name + ')',
+    //         backgroundColor: 'rgba(255, 99, 132, .5)',
+    //         borderColor: 'rgb(255, 99, 132)',
+    //         data: data,
+    //         type: 'line',
+    //         pointRadius: 0,
+    //         fill: false,
+    //         lineTension: 0,
+    //         borderWidth: 2
+    //       }]
+    //     },
+    //     options: {
+    //       scales: {
+    //         xAxes: [{
+    //           type: 'time',
+    //           distribution: 'series',
+    //           ticks: {
+    //             source: 'data',
+    //             autoSkip: true
+    //           }
+    //         }],
+    //         yAxes: [{
+    //           scaleLabel: {
+    //             display: true,
+    //             labelString: 'Response time (ms)'
+    //           }
+    //         }]
+    //       }
+    //     },
+    //     tooltips: {
+    //       intersect: false,
+    //       mode: 'index',
+    //       callbacks: {
+    //         label: function(tooltipItem, myData){
+    //           let label = myData.datasets[tooltipItem.datasetIndex].label || ''
+    //           if(label){
+    //             label += ': '
+    //           }
+    //           label += parseFloat(tooltipItem.value).toFixed(2)
+    //           return label
+    //         }
+    //       }
+    //     }
+    //   }
+    //   new chart(ctx, cfg)
+    // },
     async getDiff() {
-      this.website = this.$route.params.web
-      if(!this.website){
-        this.$router.replace('/')
-        return
-      }
+      // this.website = this.$route.params.web
+      // if(!this.website){
+      //   // this.$router.replace('/')
+      //   // return
+      // }
       this.$refs.showDiff.innerHTML = ''
       let display = this.$refs.showDiff
       if(this.website.stable != null && this.website.current != null){

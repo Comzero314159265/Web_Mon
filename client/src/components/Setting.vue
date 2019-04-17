@@ -8,41 +8,65 @@
           </v-layout>
         </v-card-title>
         <v-card-text class="pb-0">
+                    <v-layout justify-center>
+            <v-flex xs8>
           <v-switch
-              v-model="setting.title_check"
-              label="title_check"
+              v-model="setting.titleCheck"
+              label="Title Check"
               color="red"
               hide-details
           ></v-switch>
+            </v-flex></v-layout>
+                    <v-layout justify-center>
+            <v-flex xs8>
           <v-switch
-              v-model="setting.content_check"
-              label="content_check"
+              v-model="setting.contentCheck"
+              label="Content Check"
               color="red"
               hide-details
           ></v-switch>
+            </v-flex></v-layout>
+                    <v-layout justify-center>
+            <v-flex xs8>
           <v-switch
-              v-model="setting.images_check"
-              label="images_check"
+              v-model="setting.imagesCheck"
+              label="Images Check : not available"
               color="red"
               hide-details
+              disabled
           ></v-switch>
+            </v-flex></v-layout>
+                    <v-layout justify-center>
+            <v-flex xs8>
           <v-switch
-              v-model="setting.link_check"
-              label="link_check"
+              v-model="setting.linkCheck"
+              label="Link Check : not available"
               color="red"
+              disabled
               hide-details
           ></v-switch>
+            </v-flex></v-layout>
+          <v-layout justify-center>
+          <v-flex xs8>
           <v-switch
-              v-model="setting.scripts_check"
-              label="scripts_check"
+              v-model="setting.scriptsCheck"
+              label="Scripts Check : not available"
               color="red"
+              disabled
               hide-details
           ></v-switch>
-          <v-text-field
-            v-model="setting.refesh_time"
-            label="Refesh time"
+          </v-flex>
+          </v-layout>
+          <v-layout justify-center pt-1>
+            <v-flex xs8>
+            <v-text-field
+            v-model="setting.refeshTime"
+            label="Refesh Time (Min)"
             required
           ></v-text-field>
+            </v-flex>
+          </v-layout>
+
         </v-card-text>
         <v-card-actions>
           <v-layout justify-center>
@@ -60,8 +84,10 @@
 export default {
   name: 'Setting',
   mounted() {
-    this.sockets.subscribe('getSetting', data => {
-      console.log(data)
+    this.sockets.subscribe('setSetting', data => {
+      this.setting = data
+      this.$store.state.message = 'Data updated!!!'
+      this.$store.state.successAlert = true
     })
   },
   data() {
@@ -82,6 +108,7 @@ export default {
   methods: {
     settiming(){
       // console.log(this.setting)
+      this.$socket.emit('setSetting', this.setting)
     }
   },
 }
