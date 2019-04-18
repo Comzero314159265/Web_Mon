@@ -1,6 +1,10 @@
 version: '3.0'
 services:
-  app:
-    build: .
+  client:
+    build: client/
+    ports:
+      - "8888:8888"
+  server:
+    build: server/
     ports:
       - "3000:3000"
