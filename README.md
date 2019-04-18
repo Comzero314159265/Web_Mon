@@ -11,7 +11,11 @@ Webmon is blah blah blah
 </p>
 
 ## Run with docker
-
+```
+git clone https://github.com/Comzero314159265/Web_Mon.git
+cd Web_Mon
+sudo docker-compose up -d
+```
 
 ## Threshold 
 * Level 0 : Green (less than 20 percent chance)
