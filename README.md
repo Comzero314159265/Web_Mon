@@ -20,7 +20,7 @@ Webmon is blah blah blah
 * Level 3 : Red (more than 80 percent chance)
 
 ## Defacement checklist
-- [ x ] Text modified percentage:
+- [x] Text modified percentage:
 - [ ] Image modified : 
 - [ ] Script modified : 
 - [ ] Anchor modified : 

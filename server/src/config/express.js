@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const compession = require('compression')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const path = require('path')
 
 module.exports = () => {
   const app = express()
@@ -19,7 +20,12 @@ module.exports = () => {
   app.use(cors())
   require('../app/routes/index.routes')(app)
 
-  app.use(express.static(__dirname + '/public/'))
+  app.use(express.static('public'))
+
+  if (process.env.NODE_ENV === 'development') {
+    app.get(/.*/, (req, res) => res.sendFile('index.html', { root: path.resolve(__dirname, '../../public') })
+    )
+  }
 
   return app
 }
