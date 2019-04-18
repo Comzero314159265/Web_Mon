@@ -5,6 +5,7 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app/client
 RUN npm cache clean
 RUN npm install
+RUN npm run build
 WORKDIR /usr/src/app/server
 RUN npm cache clean
 RUN npm install
