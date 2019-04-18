@@ -19,7 +19,7 @@ module.exports = () => {
   app.use(cors())
   require('../app/routes/index.routes')(app)
 
-  app.use(express.static('./public'))
+  app.use(express.static(__dirname + '/public/'))
 
   return app
 }

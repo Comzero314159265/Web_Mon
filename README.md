@@ -10,16 +10,18 @@ Webmon is blah blah blah
   <img height="50" src="https://miro.medium.com/max/1022/0*xAADmPJN52Yy6XJV.jpg">
 </p>
 
-## Threshold Configuration
-* Level 0 : Normal level
-* Level 1 : Caution level
-* Level 2 : Alert level 
-* Level 3 : Critical level
+## Run with docker
+
+
+## Threshold 
+* Level 0 : Green (less than 20 percent chance)
+* Level 1 : Yellow (more than 50 percent chance)
+* Level 2 : Orage (more than 60 percent chance)
+* Level 3 : Red (more than 80 percent chance)
 
 ## Defacement checklist
-- [ ] Text modified percentage:
+- [ x ] Text modified percentage:
 - [ ] Image modified : 
 - [ ] Script modified : 
 - [ ] Anchor modified : 
-- [ ] Iframe modified : 
 - [ ] Link modified :
